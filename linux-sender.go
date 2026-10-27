@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"golang.org/x/sys/unix"
@@ -102,6 +104,27 @@ func openTun(name string, prefix netip.Prefix, mtu int) (*os.File, error) {
 		}
 	}
 	return os.NewFile(uintptr(fd), name), nil
+}
+
+// listenWithCongestionControl listens on addr with the given congestion
+// control set on the listening socket, so accepted connections start with it.
+//
+// Why: connections accepted from a listener that has the namespace default
+// (BBR on this test machine) run bbr_init during the handshake, which turns
+// on TCP internal pacing (sk_pacing_status), and switching the accepted
+// socket to CUBIC afterwards does not turn pacing off. Stock CUBIC does not
+// pace. A congestion control set on the listener is inherited by children.
+func listenWithCongestionControl(ctx context.Context, addr, cc string) (net.Listener, error) {
+	lc := net.ListenConfig{Control: func(_, _ string, rc syscall.RawConn) error {
+		var serr error
+		if err := rc.Control(func(fd uintptr) {
+			serr = unix.SetsockoptString(int(fd), unix.IPPROTO_TCP, unix.TCP_CONGESTION, cc)
+		}); err != nil {
+			return err
+		}
+		return serr
+	}}
+	return lc.Listen(ctx, "tcp4", addr)
 }
 
 // setCongestionControl selects the congestion control of one kernel TCP

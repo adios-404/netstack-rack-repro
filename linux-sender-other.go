@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"net"
 	"net/netip"
@@ -20,6 +21,10 @@ func linuxTCPSysctls() string                               { return "" }
 func setCongestionControl(net.Conn, string) error           { return errLinuxOnly }
 func congestionControlOf(net.Conn) string                   { return "" }
 func watchKernelRTOs(net.Conn, time.Time) *kernelRTOWatcher { return &kernelRTOWatcher{} }
+
+func listenWithCongestionControl(context.Context, string, string) (net.Listener, error) {
+	return nil, errLinuxOnly
+}
 
 type kernelRTOWatcher struct{}
 

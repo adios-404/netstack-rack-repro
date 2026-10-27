@@ -151,7 +151,7 @@ func main() {
 				s2c.send(append([]byte(nil), buf[:n]...))
 			}
 		}()
-		listener, err = net.Listen("tcp4", fmt.Sprintf("%s:%d", serverAddr, serverPort))
+		listener, err = listenWithCongestionControl(ctx, fmt.Sprintf("%s:%d", serverAddr, serverPort), *linuxCCFlag)
 		if err != nil {
 			log.Fatal(err)
 		}
