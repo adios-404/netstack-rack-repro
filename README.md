@@ -257,6 +257,15 @@ uses a client without timestamps:
 | master + #15432 + #16081 + TSecr fix, client without timestamps | 8 | 0.02–0.22 s, median 0.02 s | 6 of 8 |
 | Linux 6.18 kernel TCP, CUBIC, client without timestamps | 8 | 0.03–0.24 s, median 0.03 s | 6 of 8 |
 
+To see why a trial with the TSecr fix still waits for the RTO,
+`run-rack-decisions.sh` builds master + the TSecr fix, with and without
+#15432 and #16081, plus `patches/diagnostic-log-rack-decisions.patch`, which
+logs every RACK decision on a retransmitted segment, and runs them in the
+end-of-transfer scenarios and the 24-trial tail-probe scenario, with several
+jitter seeds. The logs are in
+`results/2026-10-27/rack-decisions/`, and `parse-rack-decisions.py`
+summarizes one.
+
 - **The stall.** With RACK on, as Tailscale 1.104.x ships it, every trial of
   both tail-loss scenarios stalls for 3.5–6.0 s, at a median of two
   retransmissions per RTO, whether or not the loss probe gets through.
@@ -314,16 +323,15 @@ uses a client without timestamps:
   a retransmission, so the probe fix cannot help, and gVisor master waits
   for the RTO with or without #15432 and #16081 (23 or 24 of 24 trials).
   With the TSecr fix, more than half the trials recover from the probe: 5 to
-  14 of 24 in the runs above, and 85 of 144 in runs of instrumented builds
-  (both master builds with the fix, three jitter seeds) that log every RACK
-  decision on a retransmission. In every trial that waited for the RTO, RACK
-  rejected the probe's RTT sample with RFC 8985's other test in step 2: it
-  was below the connection's minimum RTT, by at most 0.25 ms. Linux applies
-  the same test (`tcp_rack_advance`) and recovered without an RTO in 20
-  of 24. On this path every RTT lies within the jitter of the minimum, so
-  that test is close to a coin toss. Without client timestamps there is no
-  TSecr test, and master + #15432 + #16081 recovered without an RTO in 5
-  of 8.
+  14 of 24 in the runs above, and 85 of 144 in the instrumented runs
+  described above (both master builds with the fix, three jitter seeds). In
+  every trial that waited for the RTO, RACK rejected the probe's RTT sample
+  with RFC 8985's other test in step 2: it was below the connection's
+  minimum RTT, by at most 0.25 ms. Linux applies the same test
+  (`tcp_rack_advance`) and recovered without an RTO in 20 of 24. On this
+  path every RTT lies within the jitter of the minimum, so that test is
+  close to a coin toss. Without client timestamps there is no TSecr test,
+  and master + #15432 + #16081 recovered without an RTO in 5 of 8.
 - **The proposed fixes elsewhere.** In the other scenarios (the tail and the
   probe lost, a hole mid-flight, five fetches on one connection), the RTO
   counts with and without the TSecr fix and the probe fix are the same, and

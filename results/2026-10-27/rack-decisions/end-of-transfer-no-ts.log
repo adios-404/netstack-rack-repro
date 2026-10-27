@@ -1,0 +1,749 @@
+=== tsecr seed 1 no-ts
+RACKDBG new-minrtt rtt=3.368484ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.65148ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.469877ms min=4.65148ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.21596ms min=3.368484ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.505536ms min=3.469877ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.293297ms min=3.469877ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.534188ms min=3.469877ms xmits=2 cumulative=false
+trial 1 fetch 3 measured   0.023 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.283343ms min=3.469877ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.242679ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.370736ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.611502ms min=4.370736ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.516753ms min=3.611502ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.435578ms min=3.516753ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.666163ms min=3.516753ms xmits=2 cumulative=true
+trial 2 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.314465ms min=3.516753ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.453275ms min=3.516753ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.219038ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.446803ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.493696ms min=4.446803ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.341432ms min=3.493696ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.453546ms min=3.493696ms xmits=2 cumulative=true
+trial 3 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.275513ms min=3.493696ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.50905ms min=3.493696ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.35705ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.48486ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.593119ms min=4.48486ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.570808ms min=3.593119ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.318174ms min=3.35705ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.491373ms min=3.570808ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.449947ms min=3.570808ms xmits=2 cumulative=true
+trial 4 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.500485ms min=3.570808ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.497994ms min=3.570808ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.31485ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.456936ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.333514ms min=4.456936ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.249993ms min=3.31485ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.645449ms min=3.333514ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.444236ms min=3.333514ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.644333ms min=3.333514ms xmits=2 cumulative=false
+trial 5 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.410954ms min=3.333514ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.259852ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.510012ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.405169ms min=4.510012ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.215787ms min=3.259852ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.499916ms min=3.405169ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.434963ms min=3.405169ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.582337ms min=3.405169ms xmits=2 cumulative=false
+trial 6 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.330658ms min=3.405169ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.418212ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.507706ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.479092ms min=4.507706ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.239336ms min=3.418212ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.425577ms min=3.479092ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.485142ms min=3.425577ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.408283ms min=3.425577ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.631714ms min=3.425577ms xmits=2 cumulative=false
+trial 7 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.508529ms min=3.425577ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.311126ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.759525ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.509443ms min=5.759525ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.305055ms min=3.311126ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.583009ms min=3.509443ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=4.302556ms min=3.509443ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=4.310622ms min=3.509443ms xmits=2 cumulative=true
+trial 8 fetch 3 measured   0.023 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.325393ms min=3.509443ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.376679ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.542209ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.473232ms min=4.542209ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.322962ms min=3.473232ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.587345ms min=3.473232ms xmits=2 cumulative=true
+trial 9 fetch 3 measured   0.221 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.213275ms min=3.473232ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.472393ms min=3.473232ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.239844ms min=3.376679ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.370524ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.660719ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.571956ms min=4.660719ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.367414ms min=3.370524ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.523001ms min=3.571956ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.594005ms min=3.523001ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.571915ms min=3.523001ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.5678ms min=3.523001ms xmits=2 cumulative=false
+trial 10 fetch 3 measured   0.023 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.358993ms min=3.523001ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.178694ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.614886ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.529348ms min=4.614886ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.489513ms min=3.529348ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.335617ms min=3.489513ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.589696ms min=3.489513ms xmits=2 cumulative=true
+trial 11 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.416456ms min=3.489513ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.41062ms min=3.489513ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.402502ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.721611ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.550757ms min=4.721611ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.371375ms min=3.402502ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.355676ms min=3.371375ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.492863ms min=3.550757ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.448435ms min=3.550757ms xmits=2 cumulative=true
+trial 12 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+measured fetches: 12, min 0.022 s, median 0.219 s, max 0.221 s, over 1 s: 0
+=== upstream-tsecr seed 1 no-ts
+RACKDBG new-minrtt rtt=3.347453ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.686472ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.434859ms min=4.686472ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.295693ms min=3.347453ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.551143ms min=3.434859ms xmits=2 cumulative=false
+trial 1 fetch 3 measured   0.020 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.437069ms min=3.434859ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.476972ms min=3.434859ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.557271ms min=3.434859ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.24767ms min=3.295693ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.306056ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.479325ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.552805ms min=4.479325ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.538064ms min=3.552805ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.458643ms min=3.538064ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.526905ms min=3.538064ms xmits=2 cumulative=true
+trial 2 fetch 3 measured   0.221 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.495985ms min=3.538064ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.490204ms min=3.538064ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.299586ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.44919ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.394189ms min=4.44919ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.740074ms min=3.394189ms xmits=2 cumulative=false
+trial 3 fetch 3 measured   0.024 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.338035ms min=3.394189ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.426972ms min=3.394189ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.487284ms min=3.394189ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.454526ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.555702ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.567725ms min=4.555702ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.457353ms min=3.567725ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.314358ms min=3.454526ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.552392ms min=3.457353ms xmits=2 cumulative=false
+trial 4 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.376883ms min=3.457353ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.471522ms min=3.457353ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.6422ms min=3.457353ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.271348ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.635258ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.381607ms min=4.635258ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.245207ms min=3.271348ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.179292ms min=3.245207ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.50685ms min=3.381607ms xmits=2 cumulative=false
+trial 5 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.439165ms min=3.381607ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.565399ms min=3.381607ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.562919ms min=3.381607ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.167122ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.527864ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.459882ms min=4.527864ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.651767ms min=3.459882ms xmits=2 cumulative=false
+trial 6 fetch 3 measured   0.021 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.569489ms min=3.459882ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.6533ms min=3.459882ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.752983ms min=3.459882ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.33022ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.490532ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.518959ms min=4.490532ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.443238ms min=3.518959ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.31287ms min=3.33022ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.584933ms min=3.443238ms xmits=2 cumulative=false
+trial 7 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.446917ms min=3.443238ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.499562ms min=3.443238ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.752272ms min=3.443238ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.322474ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.566381ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.455715ms min=4.566381ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.644758ms min=3.455715ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.491049ms min=3.455715ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.48186ms min=3.455715ms xmits=2 cumulative=true
+trial 8 fetch 3 measured   0.021 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=5.932343ms min=3.455715ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.387936ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.572548ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.789719ms min=4.572548ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.202439ms min=3.387936ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.51743ms min=3.789719ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.516008ms min=3.51743ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.610465ms min=3.51743ms xmits=2 cumulative=true
+trial 9 fetch 3 measured   0.221 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.290752ms min=3.51743ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.41366ms min=3.51743ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.256044ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.599765ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.419681ms min=4.599765ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.631092ms min=3.419681ms xmits=2 cumulative=false
+trial 10 fetch 3 measured   0.020 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.402401ms min=3.419681ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.573926ms min=3.419681ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.720588ms min=3.419681ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.219064ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.746547ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.537501ms min=4.746547ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.506024ms min=3.537501ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.364669ms min=3.506024ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.675398ms min=3.506024ms xmits=2 cumulative=true
+trial 11 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.293578ms min=3.506024ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.466113ms min=3.506024ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.447608ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.692539ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.685181ms min=4.692539ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.386524ms min=3.447608ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.615122ms min=3.685181ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.535474ms min=3.615122ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.532559ms min=3.615122ms xmits=2 cumulative=true
+trial 12 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+measured fetches: 12, min 0.019 s, median 0.021 s, max 0.221 s, over 1 s: 0
+=== tsecr seed 2 no-ts
+RACKDBG new-minrtt rtt=3.401237ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.719726ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.524172ms min=4.719726ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.385849ms min=3.401237ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.607741ms min=3.524172ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.404805ms min=3.524172ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.472683ms min=3.524172ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.562667ms min=3.524172ms xmits=2 cumulative=true
+trial 1 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG new-minrtt rtt=3.217857ms min=3.385849ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.533452ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.57867ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.534491ms min=4.57867ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.34838ms min=3.533452ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.339338ms min=3.34838ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.503562ms min=3.534491ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.541674ms min=3.534491ms xmits=2 cumulative=true
+trial 2 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG rexmit-accept rtt=5.109269ms min=3.534491ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=5.104377ms min=3.534491ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.255786ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.561775ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.382547ms min=5.561775ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.547015ms min=3.382547ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.294452ms min=3.382547ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.460751ms min=3.382547ms xmits=2 cumulative=false
+trial 3 fetch 3 measured   0.024 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.347766ms min=3.382547ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.286442ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.3809ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.575561ms min=5.3809ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.566629ms min=3.575561ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.610273ms min=3.566629ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.43936ms min=3.566629ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.496802ms min=3.566629ms xmits=2 cumulative=false
+trial 4 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.43533ms min=3.566629ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.868376ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.584382ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.354247ms min=4.584382ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.454344ms min=3.868376ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.379874ms min=3.454344ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.505259ms min=3.354247ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.458632ms min=3.354247ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.530085ms min=3.354247ms xmits=2 cumulative=false
+trial 5 fetch 3 measured   0.023 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.490861ms min=3.354247ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.323367ms min=3.379874ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.382029ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.585016ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.595338ms min=4.585016ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.528156ms min=3.595338ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.505877ms min=3.528156ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=4.956909ms min=3.528156ms xmits=2 cumulative=true
+trial 6 fetch 3 measured   0.224 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG rexmit-accept rtt=4.845538ms min=3.528156ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=4.842042ms min=3.528156ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.348545ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.582717ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.597714ms min=4.582717ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.325494ms min=3.348545ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.518308ms min=3.597714ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.46034ms min=3.518308ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.494398ms min=3.518308ms xmits=2 cumulative=true
+trial 7 fetch 3 measured   0.221 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.492564ms min=3.518308ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.568383ms min=3.518308ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.237658ms min=3.325494ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.426744ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.273505ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.576481ms min=5.273505ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.334119ms min=3.426744ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.503939ms min=3.576481ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.438043ms min=3.503939ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.655751ms min=3.503939ms xmits=2 cumulative=true
+trial 8 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.449674ms min=3.503939ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.444776ms min=3.503939ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.236727ms min=3.334119ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.225217ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.547468ms min=0s xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=-27.704µs min=4.547468ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.641022ms min=4.547468ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.721294ms min=3.641022ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.473511ms min=3.641022ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.588411ms min=3.641022ms xmits=2 cumulative=false
+trial 9 fetch 3 measured   0.025 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.347787ms min=3.641022ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.199518ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=6.080168ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.638482ms min=6.080168ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.489908ms min=3.638482ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.481113ms min=3.489908ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.43941ms min=3.489908ms xmits=2 cumulative=true
+trial 10 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.395357ms min=3.489908ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.468118ms min=3.489908ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.313172ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.444832ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.438174ms min=4.444832ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.623819ms min=3.438174ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.569983ms min=3.438174ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.582595ms min=3.438174ms xmits=2 cumulative=true
+trial 11 fetch 3 measured   0.023 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.387291ms min=3.438174ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.412324ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.322323ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.540029ms min=5.322323ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.537591ms min=3.540029ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.3595ms min=3.412324ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.473683ms min=3.537591ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.658984ms min=3.537591ms xmits=2 cumulative=true
+trial 12 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+measured fetches: 12, min 0.022 s, median 0.219 s, max 0.224 s, over 1 s: 0
+=== upstream-tsecr seed 2 no-ts
+RACKDBG new-minrtt rtt=3.355583ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.421636ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.519556ms min=5.421636ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.542901ms min=3.519556ms xmits=2 cumulative=false
+trial 1 fetch 3 measured   0.021 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.4349ms min=3.519556ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.491193ms min=3.519556ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.643311ms min=3.519556ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.245649ms min=3.355583ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.441644ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.420529ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.433907ms min=4.420529ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.308107ms min=3.441644ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.52401ms min=3.433907ms xmits=2 cumulative=false
+trial 2 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.513563ms min=3.433907ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.50687ms min=3.433907ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.510045ms min=3.433907ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.249915ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.801129ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.54228ms min=5.801129ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.504595ms min=3.54228ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.445916ms min=3.54228ms xmits=2 cumulative=true
+trial 3 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.41792ms min=3.54228ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.410026ms min=3.54228ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.407607ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.637024ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.519704ms min=4.637024ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.304946ms min=3.407607ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.563712ms min=3.519704ms xmits=2 cumulative=false
+trial 4 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.363206ms min=3.519704ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.545216ms min=3.519704ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.649555ms min=3.519704ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.263046ms min=3.304946ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.309508ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.570011ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.433645ms min=4.570011ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.334412ms min=3.433645ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.446099ms min=3.334412ms xmits=2 cumulative=false
+trial 5 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.380897ms min=3.334412ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.498377ms min=3.334412ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.741251ms min=3.334412ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.350634ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.426765ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.555631ms min=4.426765ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.483619ms min=3.555631ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.515525ms min=3.483619ms xmits=2 cumulative=false
+trial 6 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.419177ms min=3.483619ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.574788ms min=3.483619ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.719539ms min=3.483619ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.395926ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.979227ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.535548ms min=5.979227ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.225027ms min=3.395926ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.513252ms min=3.535548ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.396835ms min=3.513252ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.712007ms min=3.513252ms xmits=2 cumulative=true
+trial 7 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG rexmit-accept rtt=3.60718ms min=3.513252ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.610258ms min=3.513252ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.308443ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.632212ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.430891ms min=4.632212ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.285199ms min=3.308443ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.422395ms min=3.430891ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.631943ms min=3.422395ms xmits=2 cumulative=false
+trial 8 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.423046ms min=3.422395ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.405975ms min=3.422395ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.604967ms min=3.422395ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.302982ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.655301ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.648322ms min=4.655301ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.59196ms min=3.648322ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.533845ms min=3.648322ms xmits=2 cumulative=true
+trial 9 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG rexmit-accept rtt=7.3137ms min=3.648322ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=7.342198ms min=3.648322ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.291887ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.541322ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.818539ms min=5.541322ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.524823ms min=3.818539ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.527252ms min=3.524823ms xmits=2 cumulative=false
+trial 10 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.302943ms min=3.524823ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.423903ms min=3.524823ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.55169ms min=3.524823ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.354213ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.574799ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.478914ms min=5.574799ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.221207ms min=3.354213ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.593962ms min=3.478914ms xmits=2 cumulative=false
+trial 11 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.320707ms min=3.478914ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.539841ms min=3.478914ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.567513ms min=3.478914ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.382694ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.619466ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.568755ms min=4.619466ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=5.45732ms min=3.568755ms xmits=2 cumulative=false
+trial 12 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+measured fetches: 12, min 0.019 s, median 0.019 s, max 0.220 s, over 1 s: 0
+=== tsecr seed 3 no-ts
+RACKDBG new-minrtt rtt=3.342444ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.069374ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.543206ms min=5.069374ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.434402ms min=3.543206ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.274818ms min=3.342444ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.299141ms min=3.434402ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.479686ms min=3.434402ms xmits=2 cumulative=true
+trial 1 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG rexmit-accept rtt=3.538683ms min=3.434402ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.536684ms min=3.434402ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.343798ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.546874ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.664868ms min=4.546874ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.278343ms min=3.343798ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.223896ms min=3.278343ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.478981ms min=3.664868ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.383516ms min=3.664868ms xmits=2 cumulative=true
+trial 2 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.345705ms min=3.664868ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.510572ms min=3.664868ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.174511ms min=3.223896ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.29125ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.531599ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.476734ms min=4.531599ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.413336ms min=3.476734ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=5.659714ms min=3.413336ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.514411ms min=3.413336ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.570439ms min=3.413336ms xmits=2 cumulative=false
+trial 3 fetch 3 measured   0.026 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=4.959604ms min=3.413336ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.246591ms min=3.29125ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.404767ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.602764ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.494003ms min=4.602764ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.233409ms min=3.404767ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.482918ms min=3.494003ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.631668ms min=3.494003ms xmits=2 cumulative=true
+trial 4 fetch 3 measured   0.221 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG rexmit-accept rtt=3.511098ms min=3.494003ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.507686ms min=3.494003ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.441187ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.522443ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.613047ms min=4.522443ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.374043ms min=3.441187ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.594625ms min=3.613047ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.644524ms min=3.594625ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.370477ms min=3.594625ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.442467ms min=3.594625ms xmits=2 cumulative=false
+trial 5 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.536787ms min=3.594625ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.440963ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.5603ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.617377ms min=4.5603ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.409106ms min=3.440963ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.530819ms min=3.617377ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.415655ms min=3.530819ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.43674ms min=3.530819ms xmits=2 cumulative=true
+trial 6 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.508245ms min=3.530819ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.508954ms min=3.530819ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.245374ms min=3.409106ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.267282ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.587978ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.476177ms min=4.587978ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.431094ms min=3.476177ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.513136ms min=3.431094ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.576922ms min=3.431094ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.588466ms min=3.431094ms xmits=2 cumulative=true
+trial 7 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.434834ms min=3.431094ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.520389ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.412248ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.581061ms min=4.412248ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.429537ms min=3.520389ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.559681ms min=3.581061ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.354222ms min=3.429537ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.436358ms min=3.559681ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.631763ms min=3.559681ms xmits=2 cumulative=true
+trial 8 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.424108ms min=3.559681ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.558238ms min=3.559681ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.429916ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.470986ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.6005ms min=4.470986ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.56025ms min=3.6005ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.381758ms min=3.429916ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.526629ms min=3.56025ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.367225ms min=3.56025ms xmits=2 cumulative=true
+trial 9 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.545385ms min=3.56025ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.538505ms min=3.56025ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.365524ms min=3.381758ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.267632ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.571887ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.62899ms min=4.571887ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.526423ms min=3.62899ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.230244ms min=3.267632ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.460131ms min=3.526423ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.572619ms min=3.526423ms xmits=2 cumulative=true
+trial 10 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.518385ms min=3.526423ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.563854ms min=3.526423ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.502661ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.572163ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.468836ms min=4.572163ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.228219ms min=3.502661ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.216913ms min=3.228219ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.513316ms min=3.468836ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.570961ms min=3.468836ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.60824ms min=3.468836ms xmits=2 cumulative=true
+trial 11 fetch 3 measured   0.022 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG minrtt-reject rtt=3.260023ms min=3.468836ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.358066ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.534899ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.49457ms min=4.534899ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.528656ms min=3.49457ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.489202ms min=3.49457ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.54083ms min=3.49457ms xmits=2 cumulative=false
+trial 12 fetch 3 measured   0.024 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+measured fetches: 12, min 0.022 s, median 0.219 s, max 0.221 s, over 1 s: 0
+=== upstream-tsecr seed 3 no-ts
+RACKDBG new-minrtt rtt=3.318871ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.742803ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.552776ms min=4.742803ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.431148ms min=3.552776ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.468601ms min=3.552776ms xmits=2 cumulative=true
+trial 1 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.454519ms min=3.552776ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.451367ms min=3.552776ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.407519ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.483394ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.648745ms min=4.483394ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.348817ms min=3.407519ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.34501ms min=3.348817ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.642852ms min=3.648745ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.505571ms min=3.648745ms xmits=2 cumulative=true
+trial 2 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.467832ms min=3.648745ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.463465ms min=3.648745ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.250824ms min=3.34501ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.423065ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.610248ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.620444ms min=4.610248ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.374507ms min=3.620444ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.384459ms min=3.423065ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.705632ms min=3.374507ms xmits=2 cumulative=false
+trial 3 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.58295ms min=3.374507ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.581393ms min=3.374507ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.582266ms min=3.374507ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.30727ms min=3.384459ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.350284ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.6305ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.46197ms min=4.6305ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.417187ms min=3.46197ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.605638ms min=3.46197ms xmits=2 cumulative=true
+trial 4 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.454561ms min=3.46197ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.452051ms min=3.46197ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.741096ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.571256ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.442525ms min=4.571256ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.332425ms min=3.741096ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.449543ms min=3.442525ms xmits=2 cumulative=false
+trial 5 fetch 3 measured   0.019 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.51064ms min=3.442525ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.503636ms min=3.442525ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.624254ms min=3.442525ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.234537ms min=3.332425ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.297598ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.67173ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.60547ms min=4.67173ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.516043ms min=3.60547ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.374136ms min=3.516043ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.526862ms min=3.516043ms xmits=2 cumulative=true
+trial 6 fetch 3 measured   0.219 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.465051ms min=3.516043ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.556289ms min=3.516043ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.377625ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.531897ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.737439ms min=4.531897ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.342001ms min=3.377625ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.387583ms min=3.737439ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.411964ms min=3.387583ms xmits=2 cumulative=false
+trial 7 fetch 3 measured   0.020 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.406159ms min=3.387583ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.574779ms min=3.387583ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.602003ms min=3.387583ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.539841ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.599561ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.552837ms min=4.599561ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.326072ms min=3.539841ms xmits=1 cumulative=true
+RACKDBG rexmit-accept rtt=3.589671ms min=3.552837ms xmits=2 cumulative=false
+trial 8 fetch 3 measured   0.021 s |    16 data pkts,     4 retransmitted | RTOs   0
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+RACKDBG rexmit-accept rtt=3.677613ms min=3.552837ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.669909ms min=3.552837ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.731152ms min=3.552837ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.344425ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=5.512893ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.597201ms min=5.512893ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.343511ms min=3.344425ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.533806ms min=3.597201ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.399002ms min=3.533806ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.628392ms min=3.533806ms xmits=2 cumulative=true
+trial 9 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 3, max 3
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.48233ms min=3.533806ms xmits=2 cumulative=true
+RACKDBG minrtt-reject rtt=3.465914ms min=3.533806ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.225034ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.651803ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.482614ms min=4.651803ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.442427ms min=3.482614ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=7.078265ms min=3.482614ms xmits=2 cumulative=true
+trial 10 fetch 3 measured   0.225 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG rexmit-accept rtt=3.60369ms min=3.482614ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.58305ms min=3.482614ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.467626ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.548898ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.455394ms min=4.548898ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.223506ms min=3.467626ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.213864ms min=3.223506ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.408742ms min=3.455394ms xmits=2 cumulative=false
+RACKDBG rexmit-accept rtt=3.60809ms min=3.455394ms xmits=2 cumulative=true
+trial 11 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+RACKDBG minrtt-reject rtt=3.36875ms min=3.455394ms xmits=2 cumulative=true
+RACKDBG rexmit-accept rtt=3.516143ms min=3.455394ms xmits=2 cumulative=true
+RACKDBG new-minrtt rtt=3.329171ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=4.63464ms min=0s xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.684541ms min=4.63464ms xmits=1 cumulative=true
+RACKDBG new-minrtt rtt=3.55911ms min=3.684541ms xmits=1 cumulative=true
+RACKDBG minrtt-reject rtt=3.471673ms min=3.55911ms xmits=2 cumulative=false
+RACKDBG minrtt-reject rtt=3.558635ms min=3.55911ms xmits=2 cumulative=true
+trial 12 fetch 3 measured   0.220 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 2, max 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+measured fetches: 12, min 0.019 s, median 0.219 s, max 0.225 s, over 1 s: 0
