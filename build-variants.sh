@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
-# Builds the reproduction against the gVisor that Tailscale v1.104.2 pins and
-# against that gVisor with the fixes applied, into ./bin:
-#   bin/repro-pin      gvisor.dev/gvisor v0.0.0-20260915211658-a6f909f08a72
-#   bin/repro-pr15432  + google/gvisor#15432 (SetPipe, DoRecovery, clone)
-#   bin/repro-guard    + no new RACK recovery during RTO recovery (alone)
-#   bin/repro-fix      + both
-#   bin/repro-fix-notsecr  + both + no TSecr test in rackControl.update (an
-#                          experiment, not a proposed change)
-#   bin/repro-master       gVisor master 4777ee78 (go branch a68437cf), 2026-10-27
-#   bin/repro-master-fix   + both fixes, rebased onto master
+# Builds the reproduction against the gVisor that Tailscale v1.104.2 pins, and
+# against that gVisor and gVisor master with the open upstream fixes applied,
+# into ./bin:
+#   bin/repro-pin                gvisor.dev/gvisor v0.0.0-20260915211658-a6f909f08a72
+#   bin/repro-pr15432            + google/gvisor#15432 (SetPipe skips RACK-lost segments)
+#   bin/repro-pr16081            + google/gvisor#16081 (no new recovery during RTO recovery)
+#   bin/repro-pr15432-16081      + both
+#   bin/repro-pr16081-notsecr, bin/repro-pr15432-16081-notsecr
+#                                + #16081, or both, + no TSecr test in
+#                                rackControl.update (an experiment, not a
+#                                proposed change)
+#   bin/repro-master             gVisor master 4777ee78 (go branch a68437cf), 2026-10-27
+#   bin/repro-master-pr15432-16081  + both, rebased onto master
+#
+# The patches carry only the PRs' non-test code; their code lines are the PRs'
+# own, as of 2026-10-27.
 #
 # Usage: ./build-variants.sh [path to a gVisor "go" branch checkout at a6f909f08a72]
 # Without an argument, the pinned module is copied out of the Go module cache.
@@ -44,14 +50,15 @@ variant() {
   # Why: -mod=mod lets master's newer dependencies update the scratch go.mod.
   go build -mod=mod -modfile="$work/go.$name.mod" -o "bin/repro-$name" .
 }
-variant pr15432 "$src" patches/1-gvisor-pr-15432-core.patch
-variant guard "$src" patches/2-rack-no-recovery-in-rto-recovery.patch
-variant fix "$src" patches/1-gvisor-pr-15432-core.patch patches/2-rack-no-recovery-in-rto-recovery.patch
-variant fix-notsecr "$src" patches/1-gvisor-pr-15432-core.patch patches/2-rack-no-recovery-in-rto-recovery.patch \
-  patches/3-experiment-no-rack-tsecr-test.patch
+variant pr15432 "$src" patches/pin-1-pr-15432-code.patch
+variant pr16081 "$src" patches/pin-2-pr-16081-code.patch
+variant pr15432-16081 "$src" patches/pin-1-pr-15432-code.patch patches/pin-2-pr-16081-code.patch
+variant pr16081-notsecr "$src" patches/pin-2-pr-16081-code.patch patches/pin-3-experiment-no-rack-tsecr-test.patch
+variant pr15432-16081-notsecr "$src" patches/pin-1-pr-15432-code.patch patches/pin-2-pr-16081-code.patch \
+  patches/pin-3-experiment-no-rack-tsecr-test.patch
 
 go mod download gvisor.dev/gvisor@"$master"
 master_src="$(go env GOMODCACHE)/gvisor.dev/gvisor@$master"
 variant master "$master_src"
-variant master-fix "$master_src" patches/master-1-and-2-code.patch
+variant master-pr15432-16081 "$master_src" patches/master-pr-15432-16081-code.patch
 ls -l bin

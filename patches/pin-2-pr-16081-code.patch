@@ -1,0 +1,44 @@
+diff --git a/pkg/tcpip/transport/tcp/rack.go b/pkg/tcpip/transport/tcp/rack.go
+index e53b2f1c4..d49c0e629 100644
+--- a/pkg/tcpip/transport/tcp/rack.go
++++ b/pkg/tcpip/transport/tcp/rack.go
+@@ -442,7 +442,9 @@ func (rc *rackControl) reorderTimerExpired() tcpip.Error {
+ 	// (gvisor#9707/#9778). detectLoss arms the timer from rcvdTime-derived
+ 	// values, so evaluating it at the timer target keeps the two consistent.
+ 	numLost := rc.detectLoss(rc.snd.reorderTimer.target)
+-	if numLost == 0 {
++	// A reordering timer must not start fast recovery while timeout recovery
++	// is still draining the pre-RTO flight. See RFC 6675, section 5.1.
++	if numLost == 0 || rc.snd.state == tcpip.RTORecovery {
+ 		return nil
+ 	}
+ 
+diff --git a/pkg/tcpip/transport/tcp/snd.go b/pkg/tcpip/transport/tcp/snd.go
+index d4509e1da..2fe323eaa 100644
+--- a/pkg/tcpip/transport/tcp/snd.go
++++ b/pkg/tcpip/transport/tcp/snd.go
+@@ -1274,6 +1274,13 @@ func (s *sender) shouldEnterRecovery() bool {
+ func (s *sender) detectLoss(seg *segment) (fastRetransmit bool) {
+ 	// We're not in fast recovery yet.
+ 
++	// Preserve timeout recovery until the pre-RTO flight is acknowledged.
++	// In particular, a duplicate ACK must not change the state to Disorder.
++	// See RFC 6675, section 5.1.
++	if s.state == tcpip.RTORecovery {
++		return false
++	}
++
+ 	// If RACK is enabled and there is no reordering we should honor the
+ 	// three duplicate ACK rule to enter recovery.
+ 	// See: https://tools.ietf.org/html/draft-ietf-tcpm-rack-08#section-4
+@@ -1780,7 +1787,9 @@ func (s *sender) handleRcvdSegment(rcvdSeg *segment) {
+ 		// After the reorder window is calculated, detect any loss by checking
+ 		// if the time elapsed after the segments are sent is greater than the
+ 		// reorder window.
+-		if numLost := s.rc.detectLoss(rcvdSeg.rcvdTime); numLost > 0 && !s.FastRecovery.Active {
++		// Do not start fast recovery while timeout recovery is still draining
++		// the pre-RTO flight. See RFC 6675, section 5.1.
++		if numLost := s.rc.detectLoss(rcvdSeg.rcvdTime); numLost > 0 && !s.FastRecovery.Active && s.state != tcpip.RTORecovery {
+ 			// If any segment is marked as lost by
+ 			// RACK, enter recovery and retransmit
+ 			// the lost segments.
