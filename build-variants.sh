@@ -28,10 +28,14 @@
 #                                + those three + google/gvisor#16419 (keep ssthresh
 #                                on repeated RTOs), stacked in that order
 #
-# The patches carry only the PRs' non-test code; their code lines are the PRs'
-# own, as of 2026-10-27. In the four-PR stack, #16495 and #16081 change the
-# same line, and the stack keeps both guards: s.state != tcpip.RTORecovery &&
-# s.enterRACKRecovery().
+# The upstream PR patches (pin-1, pin-2 and master-pr-*) carry only the PRs'
+# non-test code; their code lines are the PRs' own, as of 2026-10-27. The
+# master patches leave out #15432's resendSegment change, which master already
+# has (7c8d7811a). In the four-PR stack, #16495 and #16081 change the same
+# line, and the stack keeps both guards: s.state != tcpip.RTORecovery &&
+# s.enterRACKRecovery(). pin-3 is an experiment. pin-4 and master-tsecr-fix,
+# and pin-5 and master-tlp-new-data, are the two fixes proposed here, not
+# upstream code.
 #
 # Usage: ./build-variants.sh [path to a gVisor "go" branch checkout at a6f909f08a72]
 # Without an argument, the pinned module is copied out of the Go module cache.
