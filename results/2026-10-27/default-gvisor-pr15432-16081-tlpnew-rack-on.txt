@@ -1,0 +1,146 @@
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => /tmp/tmp.n75733DP4y/g-pr15432-16081-tlpnew (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue unlimited, MTU 1280
+loss:     in each measured fetch, deliver the first 1000 data packets, then drop up to 1400 for at most 150ms
+workload: 8 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 warm-up    0.301 s |  2393 data pkts,     0 retransmitted | RTOs   0
+          (gVisor connection: TCP timestamps on)
+trial 1 fetch 2 warm-up    0.307 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 1 fetch 3 measured   0.557 s |  2429 data pkts,    36 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 36, max 36
+         gVisor stats: retransmits 32, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   694 pkts   812832 B  retx        0 B  lost     0 | acks  568 (0 with SACK)
+  +  0.1s   342 pkts   399584 B  retx        0 B  lost    36 | acks  287 (0 with SACK)
+  +  0.3s   240 pkts   280512 B  retx    41536 B  lost     0 | acks  200 (0 with SACK)
+  +  0.4s   725 pkts   848368 B  retx        0 B  lost     0 | acks  623 (0 with SACK)
+  +  0.5s   428 pkts   500240 B  retx        0 B  lost     0 | acks  387 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    26 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    31 ssthresh    26 pipe    31 sacked     0 recovery false unacked     29 segs  rto 200ms
+  +  0.4s cwnd     2 ssthresh    24 pipe     2 sacked     0 recovery false unacked     32 segs  rto 200ms
+  +  0.4s cwnd    24 ssthresh    24 pipe    24 sacked     0 recovery false unacked     22 segs  rto 200ms
+  +  0.5s cwnd    34 ssthresh    24 pipe    34 sacked     0 recovery false unacked     32 segs  rto 200ms
+
+trial 2 fetch 1 warm-up    0.299 s |  2411 data pkts,     0 retransmitted | RTOs   0
+trial 2 fetch 2 warm-up    0.326 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 2 fetch 3 measured   0.540 s |  2432 data pkts,    39 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 39, max 39
+         gVisor stats: retransmits 37, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   708 pkts   828800 B  retx        0 B  lost     0 | acks  583 (0 with SACK)
+  +  0.1s   331 pkts   387216 B  retx        0 B  lost    39 | acks  300 (0 with SACK)
+  +  0.3s   282 pkts   330080 B  retx    45136 B  lost     0 | acks  229 (0 with SACK)
+  +  0.4s   800 pkts   935872 B  retx        0 B  lost     0 | acks  720 (0 with SACK)
+  +  0.5s   311 pkts   363168 B  retx        0 B  lost     0 | acks  308 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    32 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    34 ssthresh    32 pipe    34 sacked     0 recovery false unacked     32 segs  rto 200ms
+  +  0.4s cwnd     2 ssthresh    26 pipe     2 sacked     0 recovery false unacked     35 segs  rto 200ms
+  +  0.4s cwnd    26 ssthresh    26 pipe    26 sacked     0 recovery false unacked     24 segs  rto 200ms
+  +  0.5s cwnd    35 ssthresh    26 pipe    35 sacked     0 recovery false unacked     33 segs  rto 200ms
+
+trial 3 fetch 1 warm-up    0.299 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 3 fetch 2 warm-up    0.317 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 3 fetch 3 measured   0.533 s |  2434 data pkts,    41 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 41, max 41
+         gVisor stats: retransmits 37, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   743 pkts   869968 B  retx        0 B  lost     0 | acks  584 (0 with SACK)
+  +  0.1s   298 pkts   348448 B  retx        0 B  lost    41 | acks  252 (0 with SACK)
+  +  0.3s   324 pkts   378816 B  retx    47536 B  lost     0 | acks  262 (0 with SACK)
+  +  0.4s   822 pkts   962272 B  retx        0 B  lost     0 | acks  741 (0 with SACK)
+  +  0.5s   247 pkts   288032 B  retx        0 B  lost     0 | acks  246 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    37 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    37 ssthresh    37 pipe    37 sacked     0 recovery false unacked     35 segs  rto 200ms
+  +  0.3s cwnd     2 ssthresh    28 pipe     2 sacked     0 recovery false unacked     37 segs  rto 200ms
+  +  0.4s cwnd    28 ssthresh    28 pipe    28 sacked     0 recovery false unacked     26 segs  rto 200ms
+  +  0.5s cwnd    36 ssthresh    28 pipe    36 sacked     0 recovery false unacked     34 segs  rto 200ms
+
+trial 4 fetch 1 warm-up    0.300 s |  2402 data pkts,     0 retransmitted | RTOs   0
+trial 4 fetch 2 warm-up    0.308 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 4 fetch 3 measured   0.562 s |  2430 data pkts,    37 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 37, max 37
+         gVisor stats: retransmits 37, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   700 pkts   819200 B  retx        0 B  lost     0 | acks  572 (0 with SACK)
+  +  0.1s   337 pkts   394416 B  retx        0 B  lost    37 | acks  287 (0 with SACK)
+  +  0.3s   238 pkts   278112 B  retx    42736 B  lost     0 | acks  190 (0 with SACK)
+  +  0.4s   700 pkts   819200 B  retx        0 B  lost     0 | acks  606 (0 with SACK)
+  +  0.5s   455 pkts   531808 B  retx        0 B  lost     0 | acks  437 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    28 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    31 ssthresh    28 pipe    31 sacked     0 recovery false unacked     28 segs  rto 200ms
+  +  0.4s cwnd     2 ssthresh    25 pipe     2 sacked     0 recovery false unacked     33 segs  rto 200ms
+  +  0.4s cwnd    25 ssthresh    25 pipe    25 sacked     0 recovery false unacked     23 segs  rto 200ms
+  +  0.5s cwnd    32 ssthresh    25 pipe    32 sacked     0 recovery false unacked     30 segs  rto 200ms
+
+trial 5 fetch 1 warm-up    0.299 s |  2411 data pkts,     0 retransmitted | RTOs   0
+trial 5 fetch 2 warm-up    0.314 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 5 fetch 3 measured   0.542 s |  2432 data pkts,    39 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 39, max 39
+         gVisor stats: retransmits 38, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   736 pkts   861568 B  retx        0 B  lost     0 | acks  591 (0 with SACK)
+  +  0.1s   303 pkts   354448 B  retx        0 B  lost    39 | acks  267 (0 with SACK)
+  +  0.3s   299 pkts   349648 B  retx    45136 B  lost     0 | acks  250 (0 with SACK)
+  +  0.4s   778 pkts   910304 B  retx        0 B  lost     0 | acks  689 (0 with SACK)
+  +  0.5s   316 pkts   369168 B  retx        0 B  lost     0 | acks  280 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    34 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    35 ssthresh    34 pipe    35 sacked     0 recovery false unacked     33 segs  rto 200ms
+  +  0.4s cwnd     2 ssthresh    26 pipe     2 sacked     0 recovery false unacked     35 segs  rto 200ms
+  +  0.4s cwnd    26 ssthresh    26 pipe    26 sacked     0 recovery false unacked     24 segs  rto 200ms
+  +  0.5s cwnd    35 ssthresh    26 pipe    35 sacked     0 recovery false unacked     32 segs  rto 200ms
+
+trial 6 fetch 1 warm-up    0.300 s |  2414 data pkts,     0 retransmitted | RTOs   0
+trial 6 fetch 2 warm-up    0.331 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 6 fetch 3 measured   0.550 s |  2429 data pkts,    36 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 35, max 35
+         gVisor stats: retransmits 33, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   722 pkts   845600 B  retx        0 B  lost     0 | acks  626 (0 with SACK)
+  +  0.1s   314 pkts   366816 B  retx        0 B  lost    36 | acks  280 (0 with SACK)
+  +  0.3s   255 pkts   298512 B  retx    41536 B  lost     0 | acks  206 (0 with SACK)
+  +  0.4s   750 pkts   877536 B  retx        0 B  lost     0 | acks  645 (0 with SACK)
+  +  0.5s   388 pkts   453072 B  retx        0 B  lost     0 | acks  374 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    26 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    31 ssthresh    26 pipe    31 sacked     0 recovery false unacked     29 segs  rto 200ms
+  +  0.4s cwnd     2 ssthresh    24 pipe     2 sacked     0 recovery false unacked     32 segs  rto 200ms
+  +  0.4s cwnd    24 ssthresh    24 pipe    24 sacked     0 recovery false unacked     23 segs  rto 200ms
+  +  0.5s cwnd    34 ssthresh    24 pipe    34 sacked     0 recovery false unacked     32 segs  rto 200ms
+
+trial 7 fetch 1 warm-up    0.300 s |  2409 data pkts,     0 retransmitted | RTOs   0
+trial 7 fetch 2 warm-up    0.302 s |  2394 data pkts,     0 retransmitted | RTOs   0
+trial 7 fetch 3 measured   0.535 s |  2451 data pkts,    57 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 56, max 56
+         gVisor stats: retransmits 56, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   789 pkts   923504 B  retx        0 B  lost     0 | acks  651 (0 with SACK)
+  +  0.1s   268 pkts   314112 B  retx        0 B  lost    57 | acks  246 (0 with SACK)
+  +  0.3s   336 pkts   393216 B  retx    66736 B  lost     0 | acks  258 (0 with SACK)
+  +  0.4s   799 pkts   933472 B  retx        0 B  lost     0 | acks  673 (0 with SACK)
+  +  0.5s   259 pkts   302432 B  retx        0 B  lost     0 | acks  265 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    56 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    56 ssthresh    56 pipe    56 sacked     0 recovery false unacked     53 segs  rto 200ms
+  +  0.4s cwnd     2 ssthresh    39 pipe     2 sacked     0 recovery false unacked     53 segs  rto 200ms
+  +  0.4s cwnd    39 ssthresh    39 pipe    39 sacked     0 recovery false unacked     37 segs  rto 200ms
+  +  0.5s cwnd    41 ssthresh    39 pipe    41 sacked     0 recovery false unacked     38 segs  rto 200ms
+
+trial 8 fetch 1 warm-up    0.300 s |  2410 data pkts,     0 retransmitted | RTOs   0
+trial 8 fetch 2 warm-up    0.301 s |  2393 data pkts,     0 retransmitted | RTOs   0
+trial 8 fetch 3 measured   0.533 s |  2452 data pkts,    58 retransmitted | RTOs   1 (first at +0.35s) | retransmissions per RTO interval: median 57, max 57
+         gVisor stats: retransmits 57, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   807 pkts   945104 B  retx        0 B  lost     0 | acks  661 (0 with SACK)
+  +  0.1s   251 pkts   293712 B  retx        0 B  lost    58 | acks  232 (0 with SACK)
+  +  0.3s   333 pkts   389616 B  retx    67936 B  lost     0 | acks  265 (0 with SACK)
+  +  0.4s   820 pkts   959872 B  retx        0 B  lost     0 | acks  732 (0 with SACK)
+  +  0.5s   241 pkts   279632 B  retx        0 B  lost     0 | acks  244 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh    57 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    57 ssthresh    57 pipe    57 sacked     0 recovery false unacked     54 segs  rto 200ms
+  +  0.3s cwnd     2 ssthresh    39 pipe     2 sacked     0 recovery false unacked     54 segs  rto 200ms
+  +  0.4s cwnd    39 ssthresh    39 pipe    39 sacked     0 recovery false unacked     37 segs  rto 200ms
+  +  0.5s cwnd    41 ssthresh    39 pipe    41 sacked     0 recovery false unacked     39 segs  rto 200ms
+
+
+measured fetches: 8, min 0.533 s, median 0.542 s, max 0.562 s, over 1 s: 0
+path drops toward the client: 0 by the queue, 343 scripted
