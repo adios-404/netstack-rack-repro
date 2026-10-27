@@ -49,8 +49,11 @@ run gvisor-pr16081-rack-on               bin/repro-pr16081
 run gvisor-pr15432-16081-rack-on         bin/repro-pr15432-16081
 run gvisor-pr16081-notsecr-rack-on       bin/repro-pr16081-notsecr
 run gvisor-pr15432-16081-notsecr-rack-on bin/repro-pr15432-16081-notsecr
+run gvisor-pr16081-tsecr-rack-on         bin/repro-pr16081-tsecr
+run gvisor-pr15432-16081-tsecr-rack-on   bin/repro-pr15432-16081-tsecr
 run gvisor-master-rack-on                bin/repro-master
 run gvisor-master-pr15432-16081-rack-on  bin/repro-master-pr15432-16081
+run gvisor-master-pr15432-16081-tsecr-rack-on bin/repro-master-pr15432-16081-tsecr
 run gvisor-master-pr16495-rack-on        bin/repro-master-pr16495
 run gvisor-master-pr15432-16081-16495-16419-rack-on bin/repro-master-pr15432-16081-16495-16419
 run linux-kernel-cubic                   ./run-linux-sender.sh
