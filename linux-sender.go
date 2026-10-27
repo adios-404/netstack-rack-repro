@@ -154,6 +154,19 @@ func setCongestionControl(c net.Conn, name string) error {
 
 // congestionControlOf returns the congestion control of a kernel TCP
 // connection.
+// tcpiOptTimestamps is TCPI_OPT_TIMESTAMPS from linux/tcp.h, which
+// golang.org/x/sys/unix does not define.
+const tcpiOptTimestamps = 1
+
+// timestampsOf reports whether a kernel TCP connection uses TCP timestamps.
+func timestampsOf(c net.Conn) string {
+	info, err := kernelInfo(c)
+	if err != nil {
+		return "?"
+	}
+	return onOff(info.Options&tcpiOptTimestamps != 0)
+}
+
 func congestionControlOf(c net.Conn) string {
 	tc, ok := c.(*net.TCPConn)
 	if !ok {

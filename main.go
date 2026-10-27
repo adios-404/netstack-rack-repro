@@ -56,6 +56,7 @@ var (
 	intervalFlag = flag.Duration("interval", 3*time.Second, "idle time before each fetch (curl --rate 20/m waits 3 s)")
 	timeoutFlag  = flag.Duration("timeout", 120*time.Second, "per-fetch timeout")
 	linuxCCFlag  = flag.String("linux-cc", "cubic", "Linux sender: congestion control (Ubuntu's default is cubic)")
+	clientTSFlag = flag.Bool("client-timestamps", true, "client: offer TCP timestamps (false: strip them from its SYN, like Windows' default settings)")
 	traceFlag    = flag.Bool("trace", false, "print the per-100 ms wire trace (and gVisor sender state) for each measured fetch")
 )
 
@@ -159,7 +160,14 @@ func main() {
 	default:
 		log.Fatalf("unknown -sender %q", *senderFlag)
 	}
-	go client.pumpOutbound(ctx, c2s.send)
+	toServer := c2s.send
+	if !*clientTSFlag {
+		toServer = func(b []byte) {
+			stripSYNTimestamps(b)
+			c2s.send(b)
+		}
+	}
+	go client.pumpOutbound(ctx, toServer)
 
 	payload := make([]byte, 64<<10)
 	for i := range payload {
@@ -182,6 +190,11 @@ func main() {
 	}()
 
 	fmt.Printf("sender:   %s\n", describe)
+	clientTS := "on"
+	if !*clientTSFlag {
+		clientTS = "off (stripped from its SYN)"
+	}
+	fmt.Printf("client:   gVisor, TCP timestamps %s\n", clientTS)
 	fmt.Printf("path:     RTT %v + up to 2x%v jitter (seed %d), %g Mbit/s toward the client, queue %s, MTU %d\n",
 		*rttFlag, *jitterFlag, *seedFlag, *rateFlag, queueDesc(*queueFlag), *mtuFlag)
 	if *lossFlag == "burst" {
@@ -204,7 +217,7 @@ func main() {
 		if *senderFlag == "linux" {
 			kconn = <-kernelConn
 			if trial == 1 {
-				fmt.Printf("          (kernel connection congestion control: %s)\n", congestionControlOf(kconn))
+				fmt.Printf("          (kernel connection congestion control: %s, TCP timestamps %s)\n", congestionControlOf(kconn), timestampsOf(kconn))
 			}
 		}
 		for n := 1; n <= *warmupFlag+*fetchesFlag; n++ {
@@ -246,6 +259,11 @@ func main() {
 			r.dataPkts, r.retxPkts = trace.counts()
 			r.retxTimes = trace.retransmitTimes()
 			printFetch(r)
+			if rec != nil && trial == 1 && n == 1 {
+				if on, ok := rec.timestamps(); ok {
+					fmt.Printf("          (gVisor connection: TCP timestamps %s)\n", onOff(on))
+				}
+			}
 			if *traceFlag && measured {
 				fmt.Printf("  wire trace at the server (data sent before loss; ACKs received):\n")
 				trace.print(os.Stdout, 40)

@@ -31,6 +31,8 @@ type senderRecorder struct {
 	t0      time.Time
 	on      bool
 	samples []senderSample
+	sendTS  bool // Whether the connection uses TCP timestamps.
+	probed  bool // Whether a probe has reported sendTS yet.
 }
 
 func (r *senderRecorder) probe(st *tcp.TCPEndpointState) {
@@ -39,6 +41,7 @@ func (r *senderRecorder) probe(st *tcp.TCPEndpointState) {
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	r.sendTS, r.probed = st.SendTSOk, true
 	if !r.on {
 		return
 	}
@@ -53,6 +56,14 @@ func (r *senderRecorder) probe(st *tcp.TCPEndpointState) {
 		unacked:     uint32(snd.SndNxt - snd.SndUna),
 		rto:         snd.RTO,
 	})
+}
+
+// timestamps reports whether the server's connection uses TCP timestamps, as
+// of the last probe, and whether any probe has run yet.
+func (r *senderRecorder) timestamps() (on, known bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.sendTS, r.probed
 }
 
 func (r *senderRecorder) start(t0 time.Time) {

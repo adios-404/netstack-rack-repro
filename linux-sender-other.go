@@ -20,6 +20,7 @@ func openTun(string, netip.Prefix, int) (*os.File, error)   { return nil, errLin
 func linuxTCPSysctls() string                               { return "" }
 func setCongestionControl(net.Conn, string) error           { return errLinuxOnly }
 func congestionControlOf(net.Conn) string                   { return "" }
+func timestampsOf(net.Conn) string                          { return "" }
 func watchKernelRTOs(net.Conn, time.Time) *kernelRTOWatcher { return &kernelRTOWatcher{} }
 
 func listenWithCongestionControl(context.Context, string, string) (net.Listener, error) {
