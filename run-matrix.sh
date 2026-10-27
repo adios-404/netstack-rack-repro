@@ -4,7 +4,8 @@
 # ./build-variants.sh. Extra arguments are passed to every run.
 #
 # Usage: ./run-matrix.sh <scenario> [flags]
-# Set ONLY to a regular expression to run only the variants whose names match.
+# Set ONLY to an extended regular expression to run only the variants whose
+# whole names match it, e.g. ONLY='gvisor-pin-rack-on|linux-kernel-cubic'.
 #
 # All scenarios: 3 ms RTT plus up to 2 x 200 us of jitter, 80 Mbit/s toward the
 # client, MTU 1280, 2.8 MB fetches, 3 s idle before each fetch. Each trial is a
@@ -49,7 +50,9 @@ out="results/$(date -u +%Y-%m-%d)"
 mkdir -p "$out"
 run() {
   local name="$1"; shift
-  if [[ -n "${ONLY:-}" && ! "$name" =~ $ONLY ]]; then
+  # Why: an unanchored match let ONLY=tsecr also select the -notsecr variants
+  # and overwrite their results.
+  if [[ -n "${ONLY:-}" && ! "$name" =~ ^($ONLY)$ ]]; then
     return
   fi
   echo "== $scenario $name"
