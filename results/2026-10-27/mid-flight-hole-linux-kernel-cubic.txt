@@ -1,0 +1,81 @@
+sender:   Linux kernel TCP (kernel 6.18.44-fc-v165 tcp_congestion_control=bbr tcp_recovery=1 tcp_sack=1 tcp_slow_start_after_idle=1 tcp_early_retrans=3)
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue unlimited, MTU 1280
+loss:     in each measured fetch, deliver the first 1000 data packets, then drop up to 16 for at most 0s
+workload: 8 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+          (kernel connection congestion control: cubic)
+trial 1 fetch 1 warm-up    0.325 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 1 fetch 2 warm-up    0.307 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 1 fetch 3 measured   0.304 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   830 pkts  1019240 B  retx        0 B  lost     0 | acks  456 (0 with SACK)
+  +  0.1s   741 pkts   909948 B  retx    19648 B  lost    16 | acks  692 (205 with SACK)
+  +  0.2s   726 pkts   890460 B  retx        0 B  lost     0 | acks  589 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   19 (0 with SACK)
+
+trial 2 fetch 1 warm-up    0.330 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 2 fetch 2 warm-up    0.306 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 2 fetch 3 measured   0.311 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   657 pkts   806796 B  retx        0 B  lost     0 | acks  440 (0 with SACK)
+  +  0.1s   827 pkts  1015556 B  retx    19648 B  lost    16 | acks  582 (197 with SACK)
+  +  0.2s   813 pkts   997296 B  retx        0 B  lost     0 | acks  552 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   68 (0 with SACK)
+
+trial 3 fetch 1 warm-up    0.327 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 3 fetch 2 warm-up    0.307 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 3 fetch 3 measured   0.306 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   790 pkts   970120 B  retx        0 B  lost     0 | acks  514 (0 with SACK)
+  +  0.1s   751 pkts   922228 B  retx    19648 B  lost    16 | acks  674 (196 with SACK)
+  +  0.2s   746 pkts   916088 B  retx        0 B  lost     0 | acks  615 (0 with SACK)
+  +  0.3s    10 pkts    11212 B  retx        0 B  lost     0 | acks   22 (0 with SACK)
+
+trial 4 fetch 1 warm-up    0.306 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 4 fetch 2 warm-up    0.305 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 4 fetch 3 measured   0.305 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   831 pkts  1020468 B  retx        0 B  lost     0 | acks  493 (0 with SACK)
+  +  0.1s   750 pkts   921000 B  retx    19648 B  lost    16 | acks  687 (206 with SACK)
+  +  0.2s   716 pkts   878180 B  retx        0 B  lost     0 | acks  648 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   30 (0 with SACK)
+
+trial 5 fetch 1 warm-up    0.317 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 5 fetch 2 warm-up    0.305 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 5 fetch 3 measured   0.331 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   835 pkts  1025380 B  retx        0 B  lost     0 | acks  495 (0 with SACK)
+  +  0.1s   559 pkts   686452 B  retx    19648 B  lost    16 | acks  444 (196 with SACK)
+  +  0.2s   796 pkts   977488 B  retx        0 B  lost     0 | acks  623 (0 with SACK)
+  +  0.3s   107 pkts   130328 B  retx        0 B  lost     0 | acks  185 (0 with SACK)
+
+trial 6 fetch 1 warm-up    0.368 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 6 fetch 2 warm-up    0.310 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 6 fetch 3 measured   0.307 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   805 pkts   988540 B  retx        0 B  lost     0 | acks  542 (0 with SACK)
+  +  0.1s   776 pkts   952928 B  retx    19648 B  lost    16 | acks  632 (190 with SACK)
+  +  0.2s   716 pkts   878180 B  retx        0 B  lost     0 | acks  640 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   38 (0 with SACK)
+
+trial 7 fetch 1 warm-up    0.322 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 7 fetch 2 warm-up    0.309 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 7 fetch 3 measured   0.311 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   812 pkts   997136 B  retx        0 B  lost     0 | acks  488 (0 with SACK)
+  +  0.1s   768 pkts   943104 B  retx    19648 B  lost    16 | acks  657 (208 with SACK)
+  +  0.2s   717 pkts   879408 B  retx        0 B  lost     0 | acks  582 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   64 (0 with SACK)
+
+trial 8 fetch 1 warm-up    0.304 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 8 fetch 2 warm-up    0.304 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 8 fetch 3 measured   0.305 s |  2297 data pkts,    16 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   820 pkts  1006960 B  retx        0 B  lost     0 | acks  538 (0 with SACK)
+  +  0.1s   753 pkts   924684 B  retx    19648 B  lost    16 | acks  661 (228 with SACK)
+  +  0.2s   724 pkts   888004 B  retx        0 B  lost     0 | acks  636 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   24 (0 with SACK)
+
+
+measured fetches: 8, min 0.304 s, median 0.307 s, max 0.331 s, over 1 s: 0
+path drops toward the client: 0 by the queue, 128 scripted

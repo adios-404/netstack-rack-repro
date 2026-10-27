@@ -1,0 +1,80 @@
+sender:   Linux kernel TCP (kernel 6.18.44-fc-v165 tcp_congestion_control=bbr tcp_recovery=1 tcp_sack=1 tcp_slow_start_after_idle=1 tcp_early_retrans=3)
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue unlimited, MTU 1280
+loss:     in each measured fetch, deliver the first 1000 data packets, then drop up to 100000 for at most 0s, or until the sender resumes after a 3ms pause
+workload: 8 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+          (kernel connection congestion control: cubic)
+trial 1 fetch 1 warm-up    0.308 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 1 fetch 2 warm-up    0.305 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 1 fetch 3 measured   0.304 s |  2309 data pkts,    28 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   866 pkts  1063448 B  retx        0 B  lost     0 | acks  529 (0 with SACK)
+  +  0.1s   762 pkts   935736 B  retx    34384 B  lost    28 | acks  657 (209 with SACK)
+  +  0.2s   681 pkts   835200 B  retx        0 B  lost     0 | acks  601 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   28 (0 with SACK)
+
+trial 2 fetch 1 warm-up    0.327 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 2 fetch 2 warm-up    0.304 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 2 fetch 3 measured   0.308 s |  2320 data pkts,    39 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   845 pkts  1037660 B  retx        0 B  lost     0 | acks  518 (0 with SACK)
+  +  0.1s   759 pkts   932052 B  retx    47892 B  lost    39 | acks  645 (189 with SACK)
+  +  0.2s   716 pkts   878180 B  retx        0 B  lost     0 | acks  607 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   53 (0 with SACK)
+
+trial 3 fetch 1 warm-up    0.306 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 3 fetch 2 warm-up    0.303 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 3 fetch 3 measured   0.301 s |  2287 data pkts,     6 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   888 pkts  1090464 B  retx        0 B  lost     0 | acks  526 (0 with SACK)
+  +  0.1s   748 pkts   918544 B  retx     7368 B  lost     6 | acks  664 (227 with SACK)
+  +  0.2s   651 pkts   798360 B  retx        0 B  lost     0 | acks  671 (0 with SACK)
+
+trial 4 fetch 1 warm-up    0.335 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 4 fetch 2 warm-up    0.301 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 4 fetch 3 measured   0.305 s |  2352 data pkts,    71 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   833 pkts  1022924 B  retx        0 B  lost     0 | acks  496 (0 with SACK)
+  +  0.1s   823 pkts  1010644 B  retx    87188 B  lost    71 | acks  734 (182 with SACK)
+  +  0.2s   696 pkts   853620 B  retx        0 B  lost     0 | acks  609 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks    6 (0 with SACK)
+
+trial 5 fetch 1 warm-up    0.311 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 5 fetch 2 warm-up    0.300 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 5 fetch 3 measured   0.301 s |  2351 data pkts,    70 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   886 pkts  1088008 B  retx        0 B  lost     0 | acks  523 (0 with SACK)
+  +  0.1s   778 pkts   955384 B  retx    85960 B  lost    70 | acks  628 (179 with SACK)
+  +  0.2s   687 pkts   842568 B  retx        0 B  lost     0 | acks  650 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks    3 (0 with SACK)
+
+trial 6 fetch 1 warm-up    0.329 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 6 fetch 2 warm-up    0.304 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 6 fetch 3 measured   0.303 s |  2288 data pkts,     7 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   867 pkts  1064676 B  retx        0 B  lost     0 | acks  516 (0 with SACK)
+  +  0.1s   718 pkts   881704 B  retx     8596 B  lost     7 | acks  688 (203 with SACK)
+  +  0.2s   703 pkts   862216 B  retx        0 B  lost     0 | acks  629 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks   20 (0 with SACK)
+
+trial 7 fetch 1 warm-up    0.305 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 7 fetch 2 warm-up    0.303 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 7 fetch 3 measured   0.388 s |  2544 data pkts,   263 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   911 pkts  1118708 B  retx        0 B  lost     0 | acks  510 (0 with SACK)
+  +  0.1s   352 pkts   432256 B  retx        0 B  lost   263 | acks  277 (0 with SACK)
+  +  0.2s   769 pkts   944332 B  retx   322964 B  lost     0 | acks  485 (220 with SACK)
+  +  0.3s   512 pkts   627668 B  retx        0 B  lost     0 | acks  468 (0 with SACK)
+
+trial 8 fetch 1 warm-up    0.328 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 8 fetch 2 warm-up    0.306 s |  2281 data pkts,     0 retransmitted | RTOs   0
+trial 8 fetch 3 measured   0.300 s |  2336 data pkts,    55 retransmitted | RTOs   0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s   877 pkts  1076956 B  retx        0 B  lost     0 | acks  562 (0 with SACK)
+  +  0.1s   797 pkts   978716 B  retx    67540 B  lost    55 | acks  635 (177 with SACK)
+  +  0.2s   662 pkts   811868 B  retx        0 B  lost     0 | acks  662 (0 with SACK)
+  +  0.3s     0 pkts        0 B  retx        0 B  lost     0 | acks    2 (0 with SACK)
+
+
+measured fetches: 8, min 0.300 s, median 0.304 s, max 0.388 s, over 1 s: 0
+path drops toward the client: 0 by the queue, 539 scripted
