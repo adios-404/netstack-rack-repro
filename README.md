@@ -105,6 +105,7 @@ proposed here, not upstream code.
 | `repro-pr16081-tsecr`, `repro-pr15432-16081-tsecr` | + the TSecr fix proposed here (`patches/pin-4-tsecr-fix-code.patch`) |
 | `repro-pr15432-16081-tlpnew`, `repro-pr15432-16081-tsecr-tlpnew` | pin + both + the probe fix proposed here (`patches/pin-5-tlp-new-data-code.patch`), without or with the TSecr fix |
 | `repro-master` | gVisor master `4777ee78` (`go` branch `a68437cf`) |
+| `repro-master-tsecr` | master + the TSecr fix alone |
 | `repro-master-pr15432-16081` | master + #15432 + #16081 |
 | `repro-master-pr15432-16081-tsecr`, `repro-master-pr15432-16081-tlpnew`, `repro-master-pr15432-16081-tsecr-tlpnew` | master + both + the TSecr fix, the probe fix, or both (`patches/master-tsecr-fix-code.patch`, `patches/master-tlp-new-data-code.patch`) |
 | `repro-master-pr16495` | master + [#16495](https://github.com/google/gvisor/pull/16495) |
@@ -116,13 +117,16 @@ The two proposed changes:
   when the ACK's TSecr is older than the retransmission. A receiver echoes
   the timestamp of the segment at the left edge of its window (RFC 7323,
   section 4.3), so an ACK that SACKs a retransmission above a hole, such as
-  a tail loss probe, always fails that test, and RACK ignores it. The fix
+  a tail loss probe, usually fails that test, and RACK ignores it. The fix
   applies the test only when the ACK cumulatively acknowledges the segment.
-  Linux's `tcp_rack_advance` has no TSecr test.
+  Linux makes the same split: its TSecr test (`tcp_skb_spurious_retrans`)
+  covers cumulatively acknowledged segments, and a SACKed one passes to
+  `tcp_rack_advance`, which checks only the minimum RTT.
 - **Probe fix.** `probeTimerExpired` sends new data as the loss probe only
   while the congestion window has room, so after a tail loss the probe is a
   retransmission, whose SACK RACK can ignore as ambiguous. The fix sends new
-  data whenever there is some and the receive window allows, as RFC 8985
+  data whenever there is some and the receive window allows, even with the
+  congestion window full, but at most one segment past it, as RFC 8985
   (sections 7.3 and 9.3) and Linux's `tcp_send_loss_probe` do.
 
 `gvisor-go-test-overlay.sh` builds a tree in which gVisor's own TCP test
@@ -147,7 +151,7 @@ would. The scenarios: `default` loses the tail and the loss probe;
 `tail-tlp-survives` loses the tail, and the probe and everything after it
 arrive; `tail-tlp-survives-no-ts` is the same with a client that does not
 offer TCP timestamps; `mid-flight-hole` loses 16 packets with later ones
-arriving.
+arriving; `end-of-transfer` and `end-of-transfer-no-ts` are below.
 
 | sender | tail and probe lost | probe arrives | probe arrives, client without timestamps | hole mid-flight |
 |---|---|---|---|---|
@@ -161,13 +165,13 @@ arriving.
 | pin + #15432 + #16081 + no TSecr test (experiment) | 0.53–0.55 s (1 RTO) | 0.33–0.55 s (0–1 RTOs) | 0.30–0.55 s (0–1 RTOs) | 0.30–0.33 s (0 RTOs) |
 | pin + #16081 + TSecr fix | 0.54–0.63 s (1 RTO) | 0.54–0.58 s (1 RTO) | 0.30–0.57 s (0–1 RTOs) | 0.30–0.32 s (0 RTOs) |
 | pin + #15432 + #16081 + TSecr fix | 0.53–0.55 s (1 RTO) | 0.32–0.54 s (0–1 RTOs) | 0.30–0.34 s (0 RTOs) | 0.30–0.32 s (0 RTOs) |
-| pin + #15432 + #16081 + probe fix | 0.53–0.56 s (1 RTO) | 0.32–0.34 s (0 RTOs) | – | – |
-| pin + #15432 + #16081 + TSecr fix + probe fix | 0.53–0.55 s (1 RTO) | 0.30–0.36 s (0 RTOs) | – | 0.30–0.34 s (0 RTOs) |
+| pin + #15432 + #16081 + probe fix | 0.53–0.54 s (1 RTO) | 0.33–0.38 s (0 RTOs) | – | 0.31–0.35 s (0 RTOs) |
+| pin + #15432 + #16081 + TSecr fix + probe fix | 0.55–0.60 s (1 RTO) | 0.30–0.36 s (0 RTOs) | – | 0.30–0.36 s (0 RTOs) |
 | gVisor master `4777ee78` | 5.18–10.6 s (23–49 RTOs) | 0.30–11.6 s (0–54 RTOs) | 0.30–0.31 s, but 3 of 8 unfinished at 120 s (0–9 RTOs) | 0.30–0.32 s (0 RTOs) |
 | master + #15432 + #16081 | 0.54–0.56 s (1 RTO) | 0.33–0.55 s (0–1 RTOs) | 0.30–0.56 s (0–1 RTOs) | 0.31–0.34 s (0 RTOs) |
 | master + #15432 + #16081 + TSecr fix | 0.54–0.56 s (1 RTO) | 0.33–0.34 s (0 RTOs) | 0.30–0.55 s (0–1 RTOs) | 0.30–0.36 s (0 RTOs) |
-| master + #15432 + #16081 + probe fix | 0.53–0.55 s (1 RTO) | 0.31–0.33 s (0 RTOs) | – | 0.30–0.32 s (0 RTOs) |
-| master + #15432 + #16081 + TSecr fix + probe fix | 0.55–0.56 s (1 RTO) | 0.32–0.36 s (0 RTOs) | – | 0.30–0.32 s (0 RTOs) |
+| master + #15432 + #16081 + probe fix | 0.54–0.56 s (1 RTO) | 0.33–0.34 s (0 RTOs) | – | 0.30–0.33 s (0 RTOs) |
+| master + #15432 + #16081 + TSecr fix + probe fix | 0.54–0.59 s (1 RTO) | 0.33–0.34 s (0 RTOs) | – | 0.31–0.33 s (0 RTOs) |
 | master + #16495 | 0.79–0.81 s (2 RTOs) | 0.32–0.91 s (0–2 RTOs) | 0.30–1.02 s (0–2 RTOs) | 0.30–0.33 s (0 RTOs) |
 | master + #15432 + #16081 + #16495 + #16419 | 0.53–0.55 s (1 RTO) | 0.53–0.55 s (1 RTO) | 0.30–0.55 s (0–1 RTOs) | 0.30–0.31 s (0 RTOs) |
 | Linux 6.18 kernel TCP, CUBIC | 0.60–0.65 s (1 RTO) | 0.30–0.39 s (0 RTOs) | 0.30 s (0 RTOs) | 0.30–0.33 s (0 RTOs) |
@@ -187,12 +191,13 @@ to 7 in the raw output after the two warm-ups):
 | pin + #15432 + #16081 + no TSecr test (experiment) | 0.54, 0.56, 0.57, 0.56, 0.56 s |
 | pin + #16081 + TSecr fix | 0.55, 0.56, 0.56, 0.56, 0.56 s |
 | pin + #15432 + #16081 + TSecr fix | 0.54, 0.55, 0.56, 0.57, 0.56 s |
-| pin + #15432 + #16081 + TSecr fix + probe fix | 0.53, 0.57, 0.56, 0.56, 0.56 s |
+| pin + #15432 + #16081 + probe fix | 0.56, 0.57, 0.60, 0.58, 0.58 s |
+| pin + #15432 + #16081 + TSecr fix + probe fix | 0.56, 0.60, 0.60, 0.58, 0.60 s |
 | gVisor master `4777ee78` | 10.4, 4.76, 4.76, 4.77, 4.77 s |
 | master + #15432 + #16081 | 0.54, 0.55, 0.56, 0.55, 0.55 s |
 | master + #15432 + #16081 + TSecr fix | 0.54, 0.55, 0.55, 0.57, 0.56 s |
-| master + #15432 + #16081 + probe fix | 0.57, 0.56, 0.56, 0.55, 0.54 s |
-| master + #15432 + #16081 + TSecr fix + probe fix | 0.55, 0.55, 0.54, 0.54, 0.56 s |
+| master + #15432 + #16081 + probe fix | 0.54, 0.55, 0.54, 0.55, 0.56 s |
+| master + #15432 + #16081 + TSecr fix + probe fix | 0.54, 0.54, 0.54, 0.56, 0.56 s |
 | master + #16495 | 0.78, 0.82, 0.80, 0.80, 0.81 s |
 | master + #15432 + #16081 + #16495 + #16419 | 0.53, 0.53, 0.55, 0.53, 0.54 s |
 | Linux 6.18 kernel TCP, CUBIC | 0.62, 0.61, 0.61, 0.61, 0.62 s |
@@ -204,8 +209,8 @@ to trial, so the main variants also ran `tail-tlp-survives` with 24 trials:
 |---|---|---|---|
 | master + #15432 + #16081 | 24 | 0.31–0.59 s, median 0.55 s | 2 of 24 |
 | master + #15432 + #16081 + TSecr fix | 24 | 0.32–0.55 s, median 0.34 s | 22 of 24 |
-| master + #15432 + #16081 + probe fix | 24 | 0.32–0.34 s, median 0.33 s | 24 of 24 |
-| master + #15432 + #16081 + TSecr fix + probe fix | 24 | 0.32–0.35 s, median 0.33 s | 24 of 24 |
+| master + #15432 + #16081 + probe fix | 24 | 0.30–0.34 s, median 0.33 s | 24 of 24 |
+| master + #15432 + #16081 + TSecr fix + probe fix | 24 | 0.32–0.34 s, median 0.32 s | 24 of 24 |
 | Linux 6.18 kernel TCP, CUBIC | 24 | 0.30–0.38 s, median 0.30 s | 24 of 24 |
 
 The same scenario with eight trials:
@@ -222,16 +227,35 @@ The same scenario with eight trials:
 | pin + #15432 + #16081 + no TSecr test (experiment) | 8 | 0.33–0.55 s, median 0.43 s | 4 of 8 |
 | pin + #16081 + TSecr fix | 8 | 0.54–0.58 s, median 0.56 s | 0 of 8 |
 | pin + #15432 + #16081 + TSecr fix | 8 | 0.32–0.54 s, median 0.33 s | 7 of 8 |
-| pin + #15432 + #16081 + probe fix | 8 | 0.32–0.34 s, median 0.33 s | 8 of 8 |
-| pin + #15432 + #16081 + TSecr fix + probe fix | 8 | 0.30–0.36 s, median 0.33 s | 8 of 8 |
+| pin + #15432 + #16081 + probe fix | 8 | 0.33–0.38 s, median 0.35 s | 8 of 8 |
+| pin + #15432 + #16081 + TSecr fix + probe fix | 8 | 0.30–0.36 s, median 0.35 s | 8 of 8 |
 | gVisor master `4777ee78` | 8 | 0.30–11.6 s, median 5.48 s | 1 of 8 |
 | master + #15432 + #16081 | 8 | 0.33–0.55 s, median 0.55 s | 1 of 8 |
 | master + #15432 + #16081 + TSecr fix | 8 | 0.33–0.34 s, median 0.34 s | 8 of 8 |
-| master + #15432 + #16081 + probe fix | 8 | 0.31–0.33 s, median 0.32 s | 8 of 8 |
-| master + #15432 + #16081 + TSecr fix + probe fix | 8 | 0.32–0.36 s, median 0.34 s | 8 of 8 |
+| master + #15432 + #16081 + probe fix | 8 | 0.33–0.34 s, median 0.34 s | 8 of 8 |
+| master + #15432 + #16081 + TSecr fix + probe fix | 8 | 0.33–0.34 s, median 0.34 s | 8 of 8 |
 | master + #16495 | 8 | 0.32–0.91 s, median 0.80 s | 1 of 8 |
 | master + #15432 + #16081 + #16495 + #16419 | 8 | 0.53–0.55 s, median 0.54 s | 0 of 8 |
 | Linux 6.18 kernel TCP, CUBIC | 8 | 0.30–0.39 s, median 0.30 s | 8 of 8 |
+
+At the end of a transfer, the loss probe has to be a retransmission, because
+there is no new data to send. `end-of-transfer` sends a 14,400-byte response
+(12 packets) and loses its last 4 packets; the probe and everything after
+it arrive. 24 trials per row, and eight for `end-of-transfer-no-ts`, which
+uses a client without timestamps:
+
+| sender | trials | fetch time | trials without an RTO |
+|---|---|---|---|
+| gVisor master `4777ee78` | 24 | 0.22–0.23 s, median 0.22 s | 0 of 24 |
+| master + TSecr fix | 24 | 0.02–0.22 s, median 0.02 s | 14 of 24 |
+| master + #15432 + #16081 | 24 | 0.22 s, median 0.22 s | 1 of 24 |
+| master + #15432 + #16081 + TSecr fix | 24 | 0.02–0.22 s, median 0.22 s | 5 of 24 |
+| master + #15432 + #16081 + probe fix | 24 | 0.22 s, median 0.22 s | 0 of 24 |
+| master + #15432 + #16081 + TSecr fix + probe fix | 24 | 0.02–0.22 s, median 0.22 s | 12 of 24 |
+| Linux 6.18 kernel TCP, CUBIC | 24 | 0.03–0.24 s, median 0.03 s | 20 of 24 |
+| master + #15432 + #16081, client without timestamps | 8 | 0.02–0.22 s, median 0.02 s | 5 of 8 |
+| master + #15432 + #16081 + TSecr fix, client without timestamps | 8 | 0.02–0.22 s, median 0.02 s | 6 of 8 |
+| Linux 6.18 kernel TCP, CUBIC, client without timestamps | 8 | 0.03–0.24 s, median 0.03 s | 6 of 8 |
 
 - **The stall.** With RACK on, as Tailscale 1.104.x ships it, every trial of
   both tail-loss scenarios stalls for 3.5–6.0 s, at a median of two
@@ -248,40 +272,62 @@ The same scenario with eight trials:
   one connection, master takes 10.4 s and then 4.8 s per fetch instead of
   42–50 s, but it still stalls.
 - **Clients without timestamps.** In `tail-tlp-survives-no-ts` the stall
-  becomes a hang. Without timestamps, gVisor takes an RTT sample only from
-  an ACK beyond everything that had been sent at the previous sample, so the
-  ACKs of retransmissions give none, and nothing resets the RTO backoff. In
-  the trials that lost the whole tail, about 1000 packets, the pinned gVisor
-  and master doubled the RTO from 200 ms to 102 s and had retransmitted 20
+  becomes a hang. Without timestamps, gVisor applies Karn's rule (RFC 6298,
+  section 3): a retransmission moves `RTTMeasureSeqNum` to `SndNxt` (every
+  retransmission on master, each fast retransmit on the pin), and only an
+  ACK beyond it gives an RTT sample. During the crawl nothing new is sent,
+  so no ACK gives one, and the backed-off RTO is never recomputed. In the
+  trials that lost the whole tail, about 1000 packets, the pinned gVisor and
+  master doubled the RTO from 200 ms to 102 s and had retransmitted 20
   packets when the client gave up at 120 s (4 of 8 trials on the pin, 3 of 8
   on master). Trials with a smaller burst finished in 0.3 s. Every variant
   with #15432 or #16081 finished every fetch in at most 1.22 s.
 - **The upstream fixes.** #16081, alone or with #15432, recovers with at
-  most one RTO in every scenario here, as RACK off does; Linux also avoids
-  that RTO whenever the loss probe gets through (see below). #15432 alone
-  ends the crawl but leaves ssthresh at 2: after the idle time the pinned
-  CUBIC grows cwnd to about 450 within 100 ms, so each later burst loses
-  about 450 packets, and a fetch takes about 0.9 s instead of 0.55 s. #16495 alone ends the crawl
-  after a second RTO (0.79–0.81 s with the tail and the probe lost); stacked
-  with #15432, #16081 and #16419, the results match #15432 + #16081.
+  most one RTO in every scenario here, as RACK off does. #15432 alone ends
+  the crawl but leaves ssthresh at 2: after the idle time the pinned CUBIC
+  grows cwnd to about 450 within 100 ms, so each later burst loses about 450
+  packets, and a fetch takes about 0.9 s instead of 0.55 s. #16495 alone
+  ends the crawl after a second RTO (0.79–0.81 s with the tail and the probe
+  lost); stacked with #15432, #16081 and #16419, the results match #15432 +
+  #16081.
 - **Holes in mid-flight**, with SACKed data above them, take about 0.3 s
   with every sender: the stall needs a tail loss.
-- **A delivered loss probe.** Linux recovers without an RTO in every trial,
-  in 0.30–0.39 s. gVisor master with #15432 and #16081 does in 2 of 24:
-  after a tail loss the congestion window is full, so the probe retransmits
-  the last segment, and RACK discards its SACK. The receiver echoes the
-  timestamp of the last in-order segment, which is older than the probe,
-  and RACK's TSecr test takes that to mean the ACK was not for the probe.
-  With the TSecr fix, 22 of 24 trials recover without an RTO. With the probe
-  fix, the probe is new data, whose SACK is never ambiguous: 24 of 24, and
-  24 of 24 with both. On the pinned gVisor, the TSecr fix needs #15432
-  (0 of 8 with #16081 alone): RACK marks the tail lost, but the pipe still
-  counts it, and nothing goes out until the RTO. The experiment, which drops
-  the TSecr test altogether, recovered without an RTO in 4 of 8 trials with
-  #15432 and #16081; eight trials are too few to tell it apart from the
-  TSecr fix's 7 of 8.
-- **The proposed fixes elsewhere.** In the other scenarios, the results with
-  and without the TSecr fix and the probe fix match.
+- **A delivered loss probe.** gVisor master with #15432 and #16081 recovers
+  without an RTO in 2 of 24 trials, and in those two the burst ended
+  mid-flight, so later data was SACKed and recovery did not need the probe.
+  Linux needed no RTO in any trial, but mostly for the same reason: its
+  burst ended mid-flight in 30 of 32 trials (it lost 6–165 packets), and in
+  the 2 where it lost the whole tail, it recovered from the probe in 0.38
+  and 0.39 s. After a tail loss the congestion window is full, so the probe
+  is a retransmission, and RACK discards its SACK: the receiver echoes the
+  timestamp of the last in-order segment, which is older than the probe, and
+  RACK's TSecr test takes that to mean the ACK was not for the probe. With
+  the TSecr fix, 22 of 24 trials recover from the probe without an RTO. With
+  the probe fix, the probe is new data, whose SACK is not ambiguous: 24 of
+  24, and 24 of 24 with both. With a flight this large, the TSecr fix needs
+  #15432 on the pinned gVisor (0 of 8 with #16081 alone): RACK marks the
+  tail lost, but the pipe still counts it, and nothing goes out until the
+  RTO. The experiment, which drops the TSecr test altogether, recovered
+  without an RTO in 4 of 8 trials with #15432 and #16081; eight trials are
+  too few to tell it apart from the TSecr fix's 7 of 8.
+- **The end of a transfer.** With no new data left, the loss probe has to be
+  a retransmission, so the probe fix cannot help, and gVisor master waits
+  for the RTO with or without #15432 and #16081 (23 or 24 of 24 trials).
+  With the TSecr fix, more than half the trials recover from the probe: 5 to
+  14 of 24 in the runs above, and 85 of 144 in runs of instrumented builds
+  (both master builds with the fix, three jitter seeds) that log every RACK
+  decision on a retransmission. In every trial that waited for the RTO, RACK
+  rejected the probe's RTT sample with RFC 8985's other test in step 2: it
+  was below the connection's minimum RTT, by at most 0.25 ms. Linux applies
+  the same test (`tcp_rack_advance`) and recovered without an RTO in 20
+  of 24. On this path every RTT lies within the jitter of the minimum, so
+  that test is close to a coin toss. Without client timestamps there is no
+  TSecr test, and master + #15432 + #16081 recovered without an RTO in 5
+  of 8.
+- **The proposed fixes elsewhere.** In the other scenarios (the tail and the
+  probe lost, a hole mid-flight, five fetches on one connection), the RTO
+  counts with and without the TSecr fix and the probe fix are the same, and
+  the fetch times differ by at most 0.06 s.
 - **Loss volume.** The drop rule takes whatever the sender sends, so a
   sender with a larger window at the burst loses more. In the default
   scenario, Linux retransmitted 202–272 packets per fetch, and gVisor as
