@@ -1,6 +1,6 @@
 --- a/pkg/tcpip/transport/tcp/rack.go
 +++ b/pkg/tcpip/transport/tcp/rack.go
-@@ -98,8 +98,16 @@
+@@ -98,8 +98,19 @@
  	// for the connection.
  	// See: https://tools.ietf.org/html/draft-ietf-tcpm-rack-08#section-7.2
  	// step 2
@@ -9,8 +9,11 @@
 +	// the segment. A receiver updates the timestamp it echoes only from
 +	// segments at the left edge of its window (RFC 7323, section 4.3), so
 +	// an ACK that SACKs a retransmission above a hole, such as a tail loss
-+	// probe, echoes an older timestamp even when the retransmission arrived.
-+	// Linux's tcp_rack_advance uses only the minimum RTT check.
++	// probe, usually echoes an older timestamp even when the retransmission
++	// arrived. Linux makes the same split: tcp_clean_rtx_queue applies its
++	// TSecr test (tcp_skb_spurious_retrans) to cumulatively acknowledged
++	// segments, and tcp_sacktag_one passes SACKed ones to tcp_rack_advance,
++	// which checks only the minimum RTT.
 +	endSeq := seg.sequenceNumber.Add(seqnum.Size(seg.payloadSize()))
  	if seg.xmitCount > 1 {
 -		if ackSeg.parsedOptions.TS && ackSeg.parsedOptions.TSEcr != 0 {
@@ -18,7 +21,7 @@
  			if ackSeg.parsedOptions.TSEcr < rc.snd.ep.tsVal(seg.xmitTime) {
  				return
  			}
-@@ -122,7 +130,6 @@
+@@ -122,7 +133,6 @@
  	// Update rc.xmitTime and rc.endSequence to the transmit time and
  	// ending sequence number of the packet which has been acknowledged
  	// most recently.
