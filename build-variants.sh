@@ -18,6 +18,7 @@
 #                                (patches/pin-5-tlp-new-data-code.patch), with or
 #                                without the TSecr fix
 #   bin/repro-master             gVisor master 4777ee78 (go branch a68437cf), 2026-10-27
+#   bin/repro-master-tsecr       + the RACK TSecr fix alone
 #   bin/repro-master-pr15432-16081  + both, rebased onto master
 #   bin/repro-master-pr15432-16081-tsecr  + both + the RACK TSecr fix
 #   bin/repro-master-pr15432-16081-tlpnew  + both + the loss-probe new-data fix
@@ -88,6 +89,7 @@ variant pr15432-16081-tsecr-tlpnew "$src" patches/pin-1-pr-15432-code.patch patc
 go mod download gvisor.dev/gvisor@"$master"
 master_src="$(go env GOMODCACHE)/gvisor.dev/gvisor@$master"
 variant master "$master_src"
+variant master-tsecr "$master_src" patches/master-tsecr-fix-code.patch
 variant master-pr15432-16081 "$master_src" patches/master-pr-15432-16081-code.patch
 variant master-pr15432-16081-tsecr "$master_src" patches/master-pr-15432-16081-code.patch \
   patches/master-tsecr-fix-code.patch

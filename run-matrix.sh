@@ -71,6 +71,7 @@ run gvisor-pr15432-16081-tsecr-rack-on   bin/repro-pr15432-16081-tsecr
 run gvisor-pr15432-16081-tlpnew-rack-on  bin/repro-pr15432-16081-tlpnew
 run gvisor-pr15432-16081-tsecr-tlpnew-rack-on bin/repro-pr15432-16081-tsecr-tlpnew
 run gvisor-master-rack-on                bin/repro-master
+run gvisor-master-tsecr-rack-on          bin/repro-master-tsecr
 run gvisor-master-pr15432-16081-rack-on  bin/repro-master-pr15432-16081
 run gvisor-master-pr15432-16081-tsecr-rack-on bin/repro-master-pr15432-16081-tsecr
 run gvisor-master-pr15432-16081-tlpnew-rack-on bin/repro-master-pr15432-16081-tlpnew
