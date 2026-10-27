@@ -1,0 +1,18 @@
+diff --git a/pkg/tcpip/transport/tcp/rack.go b/pkg/tcpip/transport/tcp/rack.go
+index 3e2214bc1..de265bf6a 100644
+--- a/pkg/tcpip/transport/tcp/rack.go
++++ b/pkg/tcpip/transport/tcp/rack.go
+@@ -210,7 +210,12 @@ func (s *sender) probeTimerExpired() tcpip.Error {
+ 	}
+ 
+ 	var dataSent bool
+-	if s.writeNext != nil && s.writeNext.xmitCount == 0 && s.Outstanding < s.SndCwnd {
++	// The probe is new data when there is some and the receive window allows,
++	// even if the congestion window is full (RFC 8985, sections 7.3 and 9.3;
++	// Linux's tcp_send_loss_probe). RACK can use the SACK of a new segment,
++	// but it ignores the SACK of a retransmission when it is ambiguous, and
++	// then only the RTO recovers the tail.
++	if s.writeNext != nil && s.writeNext.xmitCount == 0 {
+ 		dataSent = s.maybeSendSegment(s.writeNext, int(s.ep.scoreboard.SMSS()), s.SndUna.Add(s.SndWnd))
+ 		if dataSent {
+ 			s.Outstanding += s.pCount(s.writeNext, s.MaxPayloadSize)
