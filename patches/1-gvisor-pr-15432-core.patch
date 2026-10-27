@@ -1,0 +1,56 @@
+diff --git a/pkg/tcpip/transport/tcp/rack.go b/pkg/tcpip/transport/tcp/rack.go
+index e53b2f1c4..c068eb85a 100644
+--- a/pkg/tcpip/transport/tcp/rack.go
++++ b/pkg/tcpip/transport/tcp/rack.go
+@@ -463,6 +463,9 @@ func (rc *rackControl) reorderTimerExpired() tcpip.Error {
+ // +checklocksexclude:rc.snd.rtt.rttMutex
+ func (rc *rackControl) DoRecovery(_ *segment, fastRetransmit bool) {
+ 	snd := rc.snd
++	// detectLoss may have marked more segments lost, which are no longer in
++	// flight.
++	snd.SetPipe()
+ 	if fastRetransmit {
+ 		snd.resendSegment()
+ 	}
+diff --git a/pkg/tcpip/transport/tcp/segment.go b/pkg/tcpip/transport/tcp/segment.go
+index dee7cbd90..197fe60e6 100644
+--- a/pkg/tcpip/transport/tcp/segment.go
++++ b/pkg/tcpip/transport/tcp/segment.go
+@@ -161,6 +161,8 @@ func (s *segment) clone() *segment {
+ 	t.rcvdTime = s.rcvdTime
+ 	t.xmitTime = s.xmitTime
+ 	t.xmitCount = s.xmitCount
++	t.acked = s.acked
++	t.lost = s.lost
+ 	t.ep = s.ep
+ 	t.qFlags = s.qFlags
+ 	t.dataMemSize = s.dataMemSize
+diff --git a/pkg/tcpip/transport/tcp/snd.go b/pkg/tcpip/transport/tcp/snd.go
+index b9227e0cd..c1738bae2 100644
+--- a/pkg/tcpip/transport/tcp/snd.go
++++ b/pkg/tcpip/transport/tcp/snd.go
+@@ -528,6 +528,11 @@ func (s *sender) resendSegment() {
+ 		s.FastRecovery.HighRxt = seg.sequenceNumber.Add(seqnum.Size(seg.payloadSize())) - 1
+ 		s.FastRecovery.RescueRxt = seg.sequenceNumber.Add(seqnum.Size(seg.payloadSize())) - 1
+ 		s.sendSegment(seg)
++		// After an RTO, writeNext points back at SndUna. Move it past seg so
++		// sendData does not send it a second time.
++		if s.writeNext == seg {
++			s.updateWriteNext(seg.Next())
++		}
+ 		s.ep.stack.Stats().TCP.FastRetransmit.Increment()
+ 		s.ep.stats.SendErrors.FastRetransmit.Increment()
+ 
+@@ -1238,7 +1243,11 @@ func (s *sender) SetPipe() {
+ 			// NOTE: here we mark the whole segment as lost. We do not try
+ 			// and test every byte in our write buffer as we maintain our
+ 			// pipe in terms of outstanding packets and not bytes.
+-			if !s.ep.scoreboard.IsRangeLost(sb) {
++			//
++			// A segment RACK marked lost is not in flight either, as in
++			// Linux's tcp_packets_in_flight. IsLost alone needs SACKed data
++			// above the segment, which a tail loss never produces.
++			if !s1.lost && !s.ep.scoreboard.IsRangeLost(sb) {
+ 				pipe++
+ 			}
+ 			// SetPipe():

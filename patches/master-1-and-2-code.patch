@@ -1,0 +1,94 @@
+diff --git a/pkg/tcpip/transport/tcp/rack.go b/pkg/tcpip/transport/tcp/rack.go
+index 3e2214bc1..6ee7d0966 100644
+--- a/pkg/tcpip/transport/tcp/rack.go
++++ b/pkg/tcpip/transport/tcp/rack.go
+@@ -448,13 +448,15 @@ func (rc *rackControl) reorderTimerExpired() tcpip.Error {
+ 	}
+ 
+ 	fastRetransmit := false
+-	if !rc.snd.FastRecovery.Active {
++	if rc.snd.rackMayEnterRecovery() {
+ 		rc.snd.cc.HandleLossDetected()
+ 		rc.snd.enterRecovery()
+ 		fastRetransmit = true
+ 	}
+ 
+-	rc.DoRecovery(nil, fastRetransmit)
++	if rc.snd.FastRecovery.Active {
++		rc.DoRecovery(nil, fastRetransmit)
++	}
+ 	return nil
+ }
+ 
+@@ -464,6 +466,9 @@ func (rc *rackControl) reorderTimerExpired() tcpip.Error {
+ // +checklocksexclude:rc.snd.rtt.rttMutex
+ func (rc *rackControl) DoRecovery(_ *segment, fastRetransmit bool) {
+ 	snd := rc.snd
++	// detectLoss may have marked more segments lost, which are no longer in
++	// flight.
++	snd.SetPipe()
+ 	if fastRetransmit {
+ 		snd.resendSegment()
+ 	}
+diff --git a/pkg/tcpip/transport/tcp/segment.go b/pkg/tcpip/transport/tcp/segment.go
+index dee7cbd90..197fe60e6 100644
+--- a/pkg/tcpip/transport/tcp/segment.go
++++ b/pkg/tcpip/transport/tcp/segment.go
+@@ -161,6 +161,8 @@ func (s *segment) clone() *segment {
+ 	t.rcvdTime = s.rcvdTime
+ 	t.xmitTime = s.xmitTime
+ 	t.xmitCount = s.xmitCount
++	t.acked = s.acked
++	t.lost = s.lost
+ 	t.ep = s.ep
+ 	t.qFlags = s.qFlags
+ 	t.dataMemSize = s.dataMemSize
+diff --git a/pkg/tcpip/transport/tcp/snd.go b/pkg/tcpip/transport/tcp/snd.go
+index 078ad7f8d..ca0495ec3 100644
+--- a/pkg/tcpip/transport/tcp/snd.go
++++ b/pkg/tcpip/transport/tcp/snd.go
+@@ -1258,7 +1258,11 @@ func (s *sender) SetPipe() {
+ 			// NOTE: here we mark the whole segment as lost. We do not try
+ 			// and test every byte in our write buffer as we maintain our
+ 			// pipe in terms of outstanding packets and not bytes.
+-			if !s.ep.scoreboard.IsRangeLost(sb) {
++			//
++			// A segment RACK marked lost is not in flight either, as in
++			// Linux's tcp_packets_in_flight. IsLost alone needs SACKed data
++			// above the segment, which a tail loss never produces.
++			if !s1.lost && !s.ep.scoreboard.IsRangeLost(sb) {
+ 				pipe++
+ 			}
+ 			// SetPipe():
+@@ -1271,6 +1275,22 @@ func (s *sender) SetPipe() {
+ 	s.Outstanding = pipe
+ }
+ 
++// rackMayEnterRecovery returns true if a loss that RACK detects can start fast
++// recovery.
++//
++// Why: after an RTO, RTO recovery resends the window that the timeout already
++// reacted to in slow start. A new recovery phase must not start until that
++// window is acknowledged (RFC 6675 section 5.1, RFC 6582 section 3.2 steps 2
++// and 4), and losses in one window get one congestion response (RFC 8985
++// section 9.3). Fast recovery here would reduce ssthresh again, from the cwnd
++// of 1 that the RTO set, and limit the rest of the repair to ssthresh+3
++// segments.
++//
++// +checklocks:s.ep.mu
++func (s *sender) rackMayEnterRecovery() bool {
++	return !s.FastRecovery.Active && s.state != tcpip.RTORecovery
++}
++
+ // shouldEnterRecovery returns true if the sender should enter fast recovery
+ // based on dupAck count and sack scoreboard.
+ // See RFC 6675 section 5.
+@@ -1795,7 +1815,7 @@ func (s *sender) handleRcvdSegment(rcvdSeg *segment) {
+ 		// After the reorder window is calculated, detect any loss by checking
+ 		// if the time elapsed after the segments are sent is greater than the
+ 		// reorder window.
+-		if numLost := s.rc.detectLoss(rcvdSeg.rcvdTime); numLost > 0 && !s.FastRecovery.Active {
++		if numLost := s.rc.detectLoss(rcvdSeg.rcvdTime); numLost > 0 && s.rackMayEnterRecovery() {
+ 			// If any segment is marked as lost by
+ 			// RACK, enter recovery and retransmit
+ 			// the lost segments.
