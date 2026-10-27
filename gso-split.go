@@ -51,13 +51,12 @@ func gsoSplit(pkt []byte, gso stack.GSO) ([][]byte, error) {
 		stcp := header.TCP(seg[ipHdrLen:])
 		binary.BigEndian.PutUint32(stcp[header.TCPSeqNumOffset:], seq+uint32(off))
 		f := flags
-		// Why: like the kernel's and wireguard-go's segmentation, only the
-		// last segment keeps FIN and PSH, and only the first keeps CWR.
+		// Why: like wireguard-go's tun.GSOSplit, which tstun uses for
+		// netstack's GSO packets, only the last segment keeps FIN and PSH.
+		// GSOSplit leaves CWR on every segment (the kernel clears it after
+		// the first), but gVisor never sets CWR.
 		if end < len(payload) {
 			f &^= header.TCPFlagFin | header.TCPFlagPsh
-		}
-		if off > 0 {
-			f &^= header.TCPFlagCwr
 		}
 		stcp.SetFlags(uint8(f))
 		// Why: gVisor leaves only the pseudo-header sum in a GSO packet's TCP
