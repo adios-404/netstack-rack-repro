@@ -12,9 +12,16 @@
 #                                proposed change)
 #   bin/repro-master             gVisor master 4777ee78 (go branch a68437cf), 2026-10-27
 #   bin/repro-master-pr15432-16081  + both, rebased onto master
+#   bin/repro-master-pr16495     + google/gvisor#16495 (no new recovery after an RTO
+#                                that interrupts SACK recovery)
+#   bin/repro-master-pr15432-16081-16495-16419
+#                                + those three + google/gvisor#16419 (keep ssthresh
+#                                on repeated RTOs), stacked in that order
 #
 # The patches carry only the PRs' non-test code; their code lines are the PRs'
-# own, as of 2026-10-27.
+# own, as of 2026-10-27. In the four-PR stack, #16495 and #16081 change the
+# same line, and the stack keeps both guards: s.state != tcpip.RTORecovery &&
+# s.enterRACKRecovery().
 #
 # Usage: ./build-variants.sh [path to a gVisor "go" branch checkout at a6f909f08a72]
 # Without an argument, the pinned module is copied out of the Go module cache.
@@ -61,4 +68,6 @@ go mod download gvisor.dev/gvisor@"$master"
 master_src="$(go env GOMODCACHE)/gvisor.dev/gvisor@$master"
 variant master "$master_src"
 variant master-pr15432-16081 "$master_src" patches/master-pr-15432-16081-code.patch
+variant master-pr16495 "$master_src" patches/master-pr-16495-code.patch
+variant master-pr15432-16081-16495-16419 "$master_src" patches/master-pr-15432-16081-16495-16419-code.patch
 ls -l bin

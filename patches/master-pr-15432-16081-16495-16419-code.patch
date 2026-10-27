@@ -1,0 +1,302 @@
+diff --git a/pkg/tcpip/transport/tcp/cubic.go b/pkg/tcpip/transport/tcp/cubic.go
+index 460e20c44..39a44db54 100644
+--- a/pkg/tcpip/transport/tcp/cubic.go
++++ b/pkg/tcpip/transport/tcp/cubic.go
+@@ -310,13 +310,17 @@ func (c *cubicState) HandleLossDetected() {
+ 	c.reduceSlowStartThreshold()
+ }
+ 
+-// HandleRTOExpired implements congestionContrl.HandleRTOExpired.
++// HandleRTOExpired implements congestionControl.HandleRTOExpired.
+ //
+ // +checklocks:c.s.ep.mu
+-func (c *cubicState) HandleRTOExpired() {
+-	// See: https://tools.ietf.org/html/rfc8312#section-4.6
++func (c *cubicState) HandleRTOExpired(reduceThreshold bool) {
++	// Linux cubictcp_state() resets the epoch on every TCP_CA_Loss, but
++	// tcp_enter_loss() calls cubictcp_recalc_ssthresh() only for a new loss.
+ 	c.T = c.s.ep.stack.Clock().NowMonotonic()
+ 	c.numCongestionEvents = 0
++	if !reduceThreshold {
++		return
++	}
+ 	c.WLastMax = c.WMax
+ 	c.WMax = float64(c.s.SndCwnd)
+ 
+@@ -324,11 +328,6 @@ func (c *cubicState) HandleRTOExpired() {
+ 
+ 	// We lost a packet, so reduce ssthresh.
+ 	c.reduceSlowStartThreshold()
+-
+-	// Reduce the congestion window to 1, i.e., enter slow-start. Per
+-	// RFC 5681, page 7, we must use 1 regardless of the value of the
+-	// initial congestion window.
+-	c.s.SndCwnd = 1
+ }
+ 
+ // fastConvergence implements the logic for Fast Convergence algorithm as
+diff --git a/pkg/tcpip/transport/tcp/rack.go b/pkg/tcpip/transport/tcp/rack.go
+index 3e2214bc1..7cffac6de 100644
+--- a/pkg/tcpip/transport/tcp/rack.go
++++ b/pkg/tcpip/transport/tcp/rack.go
+@@ -443,27 +443,38 @@ func (rc *rackControl) reorderTimerExpired() tcpip.Error {
+ 	// (gvisor#9707/#9778). detectLoss arms the timer from rcvdTime-derived
+ 	// values, so evaluating it at the timer target keeps the two consistent.
+ 	numLost := rc.detectLoss(rc.snd.reorderTimer.target)
+-	if numLost == 0 {
++	// A reordering timer must not start fast recovery while timeout recovery
++	// is still draining the pre-RTO flight. See RFC 6675, section 5.1.
++	if numLost == 0 || rc.snd.state == tcpip.RTORecovery {
+ 		return nil
+ 	}
+ 
+-	fastRetransmit := false
+-	if !rc.snd.FastRecovery.Active {
+-		rc.snd.cc.HandleLossDetected()
+-		rc.snd.enterRecovery()
+-		fastRetransmit = true
+-	}
+-
++	fastRetransmit := rc.snd.enterRACKRecovery()
+ 	rc.DoRecovery(nil, fastRetransmit)
+ 	return nil
+ }
+ 
++// enterRACKRecovery reports whether the loss starts a new recovery episode.
++//
++// +checklocks:s.ep.mu
++func (s *sender) enterRACKRecovery() bool {
++	if s.FastRecovery.Active || s.sackRecoveryInterrupted {
++		return false
++	}
++	s.cc.HandleLossDetected()
++	s.enterRecovery()
++	return true
++}
++
+ // DoRecovery implements lossRecovery.DoRecovery.
+ //
+ // +checklocks:rc.snd.ep.mu
+ // +checklocksexclude:rc.snd.rtt.rttMutex
+ func (rc *rackControl) DoRecovery(_ *segment, fastRetransmit bool) {
+ 	snd := rc.snd
++	// detectLoss may have marked more segments lost, which are no longer in
++	// flight.
++	snd.SetPipe()
+ 	if fastRetransmit {
+ 		snd.resendSegment()
+ 	}
+diff --git a/pkg/tcpip/transport/tcp/reno.go b/pkg/tcpip/transport/tcp/reno.go
+index 70603370e..f89d40ef6 100644
+--- a/pkg/tcpip/transport/tcp/reno.go
++++ b/pkg/tcpip/transport/tcp/reno.go
+@@ -106,14 +106,10 @@ func (r *renoState) HandleLossDetected() {
+ // HandleRTOExpired implements congestionControl.HandleRTOExpired.
+ //
+ // +checklocks:r.s.ep.mu
+-func (r *renoState) HandleRTOExpired() {
+-	// We lost a packet, so reduce ssthresh.
+-	r.reduceSlowStartThreshold()
+-
+-	// Reduce the congestion window to 1, i.e., enter slow-start. Per
+-	// RFC 5681, page 7, we must use 1 regardless of the value of the
+-	// initial congestion window.
+-	r.s.SndCwnd = 1
++func (r *renoState) HandleRTOExpired(reduceThreshold bool) {
++	if reduceThreshold {
++		r.reduceSlowStartThreshold()
++	}
+ }
+ 
+ // PostRecovery implements congestionControl.PostRecovery.
+diff --git a/pkg/tcpip/transport/tcp/segment.go b/pkg/tcpip/transport/tcp/segment.go
+index dee7cbd90..197fe60e6 100644
+--- a/pkg/tcpip/transport/tcp/segment.go
++++ b/pkg/tcpip/transport/tcp/segment.go
+@@ -161,6 +161,8 @@ func (s *segment) clone() *segment {
+ 	t.rcvdTime = s.rcvdTime
+ 	t.xmitTime = s.xmitTime
+ 	t.xmitCount = s.xmitCount
++	t.acked = s.acked
++	t.lost = s.lost
+ 	t.ep = s.ep
+ 	t.qFlags = s.qFlags
+ 	t.dataMemSize = s.dataMemSize
+diff --git a/pkg/tcpip/transport/tcp/snd.go b/pkg/tcpip/transport/tcp/snd.go
+index 078ad7f8d..deccf6c78 100644
+--- a/pkg/tcpip/transport/tcp/snd.go
++++ b/pkg/tcpip/transport/tcp/snd.go
+@@ -69,7 +69,9 @@ type congestionControl interface {
+ 	HandleLossDetected()
+ 
+ 	// HandleRTOExpired is invoked when the retransmit timer expires.
+-	HandleRTOExpired()
++	// reduceThreshold is false on a repeated timeout, when ssthresh
++	// must be held constant (RFC 5681 section 3.1).
++	HandleRTOExpired(reduceThreshold bool)
+ 
+ 	// HandleWindowRestart is invoked when the sender reduces its window
+ 	// after an idle period (RFC 5681 section 4.1). Linux tcp_cwnd_restart()
+@@ -129,6 +131,10 @@ type sender struct {
+ 	// the first segment that was retransmitted due to RTO expiration.
+ 	firstRetransmittedSegXmitTime tcpip.MonotonicTime
+ 
++	// rtoRepeat is true if the retransmit timer has retransmitted data
++	// since the last cumulative ACK that advanced SND.UNA.
++	rtoRepeat bool
++
+ 	// zeroWindowProbing is set if the sender is currently probing
+ 	// for zero receive window.
+ 	zeroWindowProbing bool `state:"nosave"`
+@@ -189,6 +195,10 @@ type sender struct {
+ 	// spuriously as described in RFC3522 Section 3.2.
+ 	spuriousRecovery bool
+ 
++	// sackRecoveryInterrupted indicates that an RTO ended SACK recovery
++	// but the peer has not cumulatively acknowledged FastRecovery.Last.
++	sackRecoveryInterrupted bool
++
+ 	// retransmitTS is the timestamp at which the sender sends retransmitted
+ 	// segment after entering an RTO for the first time as described in
+ 	// RFC3522 Section 3.2.
+@@ -623,6 +633,13 @@ func (s *sender) retransmitTimerExpired() tcpip.Error {
+ 	if s.RTO > remaining {
+ 		s.RTO = remaining
+ 	}
++	// A closed receive window with no data in flight calls for a persist
++	// probe, not loss recovery. Linux tcp_probe_timer() makes the same
++	// distinction from an RTO on outstanding data after a window shrink.
++	if s.zeroWindowProbing && s.SndUna == s.SndNxt {
++		s.sendZeroWindowProbe()
++		return nil
++	}
+ 
+ 	// See: https://tools.ietf.org/html/rfc6582#section-3.2 Step 4.
+ 	//
+@@ -630,7 +647,13 @@ func (s *sender) retransmitTimerExpired() tcpip.Error {
+ 	//     After a retransmit timeout, record the highest sequence number
+ 	//     transmitted in the variable recover, and exit the fast recovery
+ 	//     procedure if applicable.
+-	s.FastRecovery.Last = s.SndNxt - 1
++	// If the timeout interrupts SACK recovery, RFC 6675 section 5.1
++	// prohibits another recovery until this flight is acknowledged.
++	// A later timeout must not move that boundary to cover newer data.
++	if !s.sackRecoveryInterrupted {
++		s.FastRecovery.Last = s.SndNxt - 1
++		s.sackRecoveryInterrupted = s.FastRecovery.Active && s.ep.SACKPermitted
++	}
+ 
+ 	if s.FastRecovery.Active {
+ 		// We were attempting fast recovery but were not successful.
+@@ -644,7 +667,11 @@ func (s *sender) retransmitTimerExpired() tcpip.Error {
+ 	s.recordRetransmitTS()
+ 
+ 	s.state = tcpip.RTORecovery
+-	s.cc.HandleRTOExpired()
++	// As in Linux tcp_enter_loss(), reduce ssthresh only on the first
++	// timeout after the cumulative ACK advances.
++	s.cc.HandleRTOExpired(!s.rtoRepeat)
++	// RFC 5681 section 3.1: the loss window is one segment regardless of IW.
++	s.SndCwnd = 1
+ 
+ 	// Mark the next segment to be sent as the first unacknowledged one and
+ 	// start sending again. Set the number of outstanding packets to 0 so
+@@ -690,6 +717,7 @@ func (s *sender) retransmitTimerExpired() tcpip.Error {
+ 		return &tcpip.ErrTimeout{}
+ 	}
+ 
++	s.rtoRepeat = true
+ 	s.sendData()
+ 
+ 	return nil
+@@ -1258,7 +1286,11 @@ func (s *sender) SetPipe() {
+ 			// NOTE: here we mark the whole segment as lost. We do not try
+ 			// and test every byte in our write buffer as we maintain our
+ 			// pipe in terms of outstanding packets and not bytes.
+-			if !s.ep.scoreboard.IsRangeLost(sb) {
++			//
++			// A segment RACK marked lost is not in flight either, as in
++			// Linux's tcp_packets_in_flight. IsLost alone needs SACKed data
++			// above the segment, which a tail loss never produces.
++			if !s1.lost && !s.ep.scoreboard.IsRangeLost(sb) {
+ 				pipe++
+ 			}
+ 			// SetPipe():
+@@ -1289,6 +1321,13 @@ func (s *sender) shouldEnterRecovery() bool {
+ func (s *sender) detectLoss(seg *segment) (fastRetransmit bool) {
+ 	// We're not in fast recovery yet.
+ 
++	// Preserve timeout recovery until the pre-RTO flight is acknowledged.
++	// In particular, a duplicate ACK must not change the state to Disorder.
++	// See RFC 6675, section 5.1.
++	if s.state == tcpip.RTORecovery {
++		return false
++	}
++
+ 	// If RACK is enabled and there is no reordering we should honor the
+ 	// three duplicate ACK rule to enter recovery.
+ 	// See: https://tools.ietf.org/html/draft-ietf-tcpm-rack-08#section-4
+@@ -1623,7 +1662,7 @@ func (s *sender) handleRcvdSegment(rcvdSeg *segment) {
+ 		if (ack-1).InRange(s.SndUna, s.SndNxt) && s.FastRecovery.Last.LessThan(ack) {
+ 			s.leaveRecovery()
+ 		}
+-	} else {
++	} else if !s.sackRecoveryInterrupted {
+ 		// Detect loss by counting the duplicates and enter recovery.
+ 		fastRetransmit = s.detectLoss(rcvdSeg)
+ 	}
+@@ -1693,6 +1732,7 @@ func (s *sender) handleRcvdSegment(rcvdSeg *segment) {
+ 		// Remove all acknowledged data from the write list.
+ 		acked := s.SndUna.Size(ack)
+ 		s.SndUna = ack
++		s.rtoRepeat = false
+ 		ackLeft := acked
+ 		originalOutstanding := s.Outstanding
+ 		for ackLeft > 0 {
+@@ -1751,6 +1791,7 @@ func (s *sender) handleRcvdSegment(rcvdSeg *segment) {
+ 		if !s.FastRecovery.Active {
+ 			s.cc.Update(originalOutstanding-s.Outstanding, bestRTT, rcvdSeg.rcvdTime)
+ 			if s.FastRecovery.Last.LessThan(s.SndUna) {
++				s.sackRecoveryInterrupted = false
+ 				s.state = tcpip.Open
+ 				// Update RACK when we are exiting fast or RTO
+ 				// recovery as described in the RFC
+@@ -1795,12 +1836,9 @@ func (s *sender) handleRcvdSegment(rcvdSeg *segment) {
+ 		// After the reorder window is calculated, detect any loss by checking
+ 		// if the time elapsed after the segments are sent is greater than the
+ 		// reorder window.
+-		if numLost := s.rc.detectLoss(rcvdSeg.rcvdTime); numLost > 0 && !s.FastRecovery.Active {
+-			// If any segment is marked as lost by
+-			// RACK, enter recovery and retransmit
+-			// the lost segments.
+-			s.cc.HandleLossDetected()
+-			s.enterRecovery()
++		// Do not start fast recovery while timeout recovery is still draining
++		// the pre-RTO flight. See RFC 6675, section 5.1.
++		if numLost := s.rc.detectLoss(rcvdSeg.rcvdTime); numLost > 0 && s.state != tcpip.RTORecovery && s.enterRACKRecovery() {
+ 			fastRetransmit = true
+ 		}
+ 
+diff --git a/pkg/tcpip/transport/tcp/state.go b/pkg/tcpip/transport/tcp/state.go
+index 40c105f6a..06104164c 100644
+--- a/pkg/tcpip/transport/tcp/state.go
++++ b/pkg/tcpip/transport/tcp/state.go
+@@ -159,15 +159,14 @@ type TCPEndpointID struct {
+ //
+ // +stateify savable
+ type TCPFastRecoveryState struct {
+-	// Active if true indicates the endpoint is in fast recovery. The
+-	// following fields are only meaningful when Active is true.
++	// Active indicates the endpoint is in fast recovery.
+ 	Active bool
+ 
+ 	// First is the first unacknowledged sequence number being recovered.
+ 	First seqnum.Value
+ 
+-	// Last is the 'recover' sequence number that indicates the point at
+-	// which we should exit recovery barring any timeouts etc.
++	// Last is the highest byte covered by the recovery episode. It remains
++	// meaningful after a retransmission timeout ends fast recovery.
+ 	Last seqnum.Value
+ 
+ 	// MaxCwnd is the maximum value we are permitted to grow the congestion
