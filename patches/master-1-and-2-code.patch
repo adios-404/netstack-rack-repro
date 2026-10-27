@@ -44,7 +44,7 @@ index dee7cbd90..197fe60e6 100644
  	t.qFlags = s.qFlags
  	t.dataMemSize = s.dataMemSize
 diff --git a/pkg/tcpip/transport/tcp/snd.go b/pkg/tcpip/transport/tcp/snd.go
-index 078ad7f8d..ca0495ec3 100644
+index 078ad7f8d..d97c18e90 100644
 --- a/pkg/tcpip/transport/tcp/snd.go
 +++ b/pkg/tcpip/transport/tcp/snd.go
 @@ -1258,7 +1258,11 @@ func (s *sender) SetPipe() {
@@ -71,9 +71,9 @@ index 078ad7f8d..ca0495ec3 100644
 +// reacted to in slow start. A new recovery phase must not start until that
 +// window is acknowledged (RFC 6675 section 5.1, RFC 6582 section 3.2 steps 2
 +// and 4), and losses in one window get one congestion response (RFC 8985
-+// section 9.3). Fast recovery here would reduce ssthresh again, from the cwnd
-+// of 1 that the RTO set, and limit the rest of the repair to ssthresh+3
-+// segments.
++// section 9.3). Fast recovery here would reduce ssthresh a second time, from
++// the cwnd that slow start has reached since the RTO, and limit the rest of
++// the repair to ssthresh+3 segments.
 +//
 +// +checklocks:s.ep.mu
 +func (s *sender) rackMayEnterRecovery() bool {
