@@ -2,9 +2,14 @@ package main
 
 import (
 	"math/rand/v2"
+	"runtime"
 	"sync"
 	"time"
 )
+
+// spinWindow is how close to a packet's delivery time deliverLoop stops
+// sleeping and starts yielding in a loop instead.
+const spinWindow = 2 * time.Millisecond
 
 // pathDirection emulates one direction of the path between the two TCP
 // endpoints: a drop-tail bottleneck queue with a fixed service rate, followed
@@ -128,7 +133,15 @@ func (d *pathDirection) deliverLoop() {
 		wait := time.Until(d.inFlight[0].deliverAt)
 		if wait > 0 {
 			d.mu.Unlock()
-			time.Sleep(wait)
+			// Why: when the process is idle, Go's netpoller sleeps in whole
+			// milliseconds (runtime/netpoll_epoll.go), so a 1.5 ms sleep can
+			// last 2.2 ms and a nominal 3 ms path measured about 4.5 ms. Sleep
+			// until spinWindow before the delivery time, then yield-spin.
+			if wait > spinWindow {
+				time.Sleep(wait - spinWindow)
+			} else {
+				runtime.Gosched()
+			}
 			continue
 		}
 		now := time.Now()
