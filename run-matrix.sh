@@ -12,12 +12,14 @@
 # fetch, the first 1000 data packets are delivered and then:
 #   default            every data packet in the next 150 ms is dropped. The
 #                      tail and the loss probe are lost, so recovery starts
-#                      with an RTO, as in the issue's capture. 8 trials.
+#                      with an RTO. 8 trials.
 #   long-lived         the same, on each of 5 fetches on one connection, so
 #                      effects carry over from one fetch to the next. 1 trial.
 #   tail-tlp-survives  every data packet is dropped until the sender pauses for
 #                      3 ms; the loss probe and everything after it arrive, so
-#                      recovery can start from the probe. 8 trials.
+#                      recovery can start from the probe, and the ACKs during
+#                      a crawl carry SACK blocks, as in the excerpt in #21946.
+#                      8 trials.
 #   mid-flight-hole    16 data packets are dropped and later ones arrive, so
 #                      SACKs drive recovery without a timer. 8 trials.
 #   tail-tlp-survives-no-ts
