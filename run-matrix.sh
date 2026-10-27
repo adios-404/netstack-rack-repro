@@ -20,15 +20,19 @@
 #                      recovery can start from the probe. 8 trials.
 #   mid-flight-hole    16 data packets are dropped and later ones arrive, so
 #                      SACKs drive recovery without a timer. 8 trials.
+#   tail-tlp-survives-no-ts
+#                      tail-tlp-survives with a client that does not offer TCP
+#                      timestamps, like Windows' default settings. 8 trials.
 set -euo pipefail
 cd "$(dirname "$0")"
-scenario="${1:?scenario: default, long-lived, tail-tlp-survives or mid-flight-hole}"
+scenario="${1:?scenario: default, long-lived, tail-tlp-survives, mid-flight-hole or tail-tlp-survives-no-ts}"
 shift
 case "$scenario" in
 default) flags=(-trials 8) ;;
 long-lived) flags=(-trials 1 -fetches 5) ;;
 tail-tlp-survives) flags=(-trials 8 -burst-drop 100000 -burst-window 0 -burst-until-gap 3ms) ;;
 mid-flight-hole) flags=(-trials 8 -burst-drop 16 -burst-window 0) ;;
+tail-tlp-survives-no-ts) flags=(-trials 8 -burst-drop 100000 -burst-window 0 -burst-until-gap 3ms -client-timestamps=false) ;;
 *)
   echo "unknown scenario: $scenario" >&2
   exit 2
