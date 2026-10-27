@@ -8,9 +8,10 @@
 # whole names match it, e.g. ONLY='gvisor-pin-rack-on|linux-kernel-cubic'.
 #
 # All scenarios: 3 ms RTT plus up to 2 x 200 us of jitter, 80 Mbit/s toward the
-# client, MTU 1280, 2.8 MB fetches, 3 s idle before each fetch. Each trial is a
-# new connection with 2 loss-free warm-up fetches; then, in each measured
-# fetch, the first 1000 data packets are delivered and then:
+# client, MTU 1280, 2.8 MB fetches unless noted, 3 s idle before each fetch.
+# Each trial is a new connection with 2 loss-free warm-up fetches; then, in
+# each measured fetch, the first 1000 data packets are delivered (unless
+# noted) and then:
 #   default            every data packet in the next 150 ms is dropped. The
 #                      tail and the loss probe are lost, so recovery starts
 #                      with an RTO. 8 trials.
@@ -29,9 +30,17 @@
 #   tail-tlp-survives-24-trials
 #                      tail-tlp-survives with 24 trials, for the variants whose
 #                      results vary from trial to trial.
+#   end-of-transfer    14,400-byte fetches, 12 data packets from either
+#                      sender: the first 8 are delivered and the last 4
+#                      dropped, and everything after them arrives. With no
+#                      new data left, the loss probe has to be a
+#                      retransmission. 24 trials.
+#   end-of-transfer-no-ts
+#                      end-of-transfer with a client that does not offer TCP
+#                      timestamps. 8 trials.
 set -euo pipefail
 cd "$(dirname "$0")"
-scenario="${1:?scenario: default, long-lived, tail-tlp-survives, mid-flight-hole, tail-tlp-survives-no-ts or tail-tlp-survives-24-trials}"
+scenario="${1:?scenario: default, long-lived, tail-tlp-survives, mid-flight-hole, tail-tlp-survives-no-ts, tail-tlp-survives-24-trials, end-of-transfer or end-of-transfer-no-ts}"
 shift
 case "$scenario" in
 default) flags=(-trials 8) ;;
@@ -40,6 +49,11 @@ tail-tlp-survives) flags=(-trials 8 -burst-drop 100000 -burst-window 0 -burst-un
 mid-flight-hole) flags=(-trials 8 -burst-drop 16 -burst-window 0) ;;
 tail-tlp-survives-no-ts) flags=(-trials 8 -burst-drop 100000 -burst-window 0 -burst-until-gap 3ms -client-timestamps=false) ;;
 tail-tlp-survives-24-trials) flags=(-trials 24 -burst-drop 100000 -burst-window 0 -burst-until-gap 3ms) ;;
+# Why: 14,400 bytes is 12 packets from either sender (gVisor sends 1200-byte
+# payloads here, Linux 1228), so the 4 dropped packets are exactly the tail. At
+# 14,736 bytes gVisor sent a 13th packet, which arrived above the hole.
+end-of-transfer) flags=(-trials 24 -size 14400 -burst-keep-first 8 -burst-drop 4 -burst-window 0) ;;
+end-of-transfer-no-ts) flags=(-trials 8 -size 14400 -burst-keep-first 8 -burst-drop 4 -burst-window 0 -client-timestamps=false) ;;
 *)
   echo "unknown scenario: $scenario" >&2
   exit 2
