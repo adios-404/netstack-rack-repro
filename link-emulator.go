@@ -99,12 +99,14 @@ func (d *pathDirection) send(b []byte) {
 	d.busyUntil = depart
 	d.departs = append(d.departs, depart)
 	deliverAt := depart.Add(d.delay)
-	// Why: on a path with a constant delay, an RTO retransmission's RTT ties
-	// RACK's minimum RTT, and RACK discards retransmission RTT samples below
-	// it (rack.go, rackControl.update), so whether loss recovery starts would
-	// depend on scheduling noise. Real Wi-Fi paths have far more jitter than
-	// this; the seeded generator keeps runs comparable. Delivery order is kept
-	// so the jitter never looks like reordering.
+	// Why: on a path with a constant delay, every RTT sample lies within
+	// scheduling noise of RACK's minimum RTT, and RACK ignores a
+	// retransmission's sample below that minimum (rack.go,
+	// rackControl.update), so noise alone would decide which retransmissions
+	// count. Real Wi-Fi paths have far more jitter than this. The stall
+	// reproduces without jitter too (-jitter 0). The seeded generator keeps
+	// runs comparable, and delivery order is kept so the jitter never looks
+	// like reordering.
 	if d.jitter > 0 {
 		deliverAt = deliverAt.Add(time.Duration(d.rng.Int64N(int64(d.jitter))))
 	}
