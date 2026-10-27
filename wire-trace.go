@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"gvisor.dev/gvisor/pkg/tcpip"
+	"gvisor.dev/gvisor/pkg/tcpip/header"
 )
 
 const bucketWidth = 100 * time.Millisecond
@@ -68,11 +69,19 @@ func (w *wireTrace) bucketLocked(now time.Time) *traceBucket {
 func seqLess(a, b uint32) bool { return int32(a-b) < 0 }
 
 func (w *wireTrace) recordSent(now time.Time, p *packetInfo) {
-	if !p.isTCP || p.src != w.server || p.payloadLen == 0 {
+	if !p.isTCP || p.src != w.server {
 		return
 	}
 	w.mu.Lock()
 	defer w.mu.Unlock()
+	// Why: a later trial's connection can get the same client port, and its
+	// sequence numbers must not be compared with the earlier connection's.
+	if p.flags&header.TCPFlagSyn != 0 {
+		delete(w.highestEnd, flowKey{p.srcPort, p.dstPort})
+	}
+	if p.payloadLen == 0 {
+		return
+	}
 	b := w.bucketLocked(now)
 	b.dataPkts++
 	b.dataBytes += p.payloadLen
