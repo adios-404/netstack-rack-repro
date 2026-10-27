@@ -1,0 +1,43 @@
+--- a/pkg/tcpip/transport/tcp/rack.go
++++ b/pkg/tcpip/transport/tcp/rack.go
+@@ -15,6 +15,8 @@
+ package tcp
+ 
+ import (
++	"fmt"
++	"os"
+ 	"time"
+ 
+ 	"gvisor.dev/gvisor/pkg/tcpip"
+@@ -113,12 +115,15 @@
+ 	if seg.xmitCount > 1 {
+ 		if endSeq.LessThanEq(ackSeg.ackNumber) && ackSeg.parsedOptions.TS && ackSeg.parsedOptions.TSEcr != 0 {
+ 			if ackSeg.parsedOptions.TSEcr < rc.snd.ep.tsVal(seg.xmitTime) {
++				rackDbg("tsecr-reject", rtt, rc.minRTT, seg.xmitCount, endSeq.LessThanEq(ackSeg.ackNumber))
+ 				return
+ 			}
+ 		}
+ 		if rtt < rc.minRTT {
++			rackDbg("minrtt-reject", rtt, rc.minRTT, seg.xmitCount, endSeq.LessThanEq(ackSeg.ackNumber))
+ 			return
+ 		}
++		rackDbg("rexmit-accept", rtt, rc.minRTT, seg.xmitCount, endSeq.LessThanEq(ackSeg.ackNumber))
+ 	}
+ 
+ 	rc.RTT = rtt
+@@ -128,6 +133,7 @@
+ 	// of recent RTT measurements. This implementation keeps track of the
+ 	// simple global minimum of all RTTs for the connection.
+ 	if rtt < rc.minRTT || rc.minRTT == 0 {
++		rackDbg("new-minrtt", rtt, rc.minRTT, seg.xmitCount, endSeq.LessThanEq(ackSeg.ackNumber))
+ 		rc.minRTT = rtt
+ 	}
+ 
+@@ -510,3 +516,7 @@
+ 
+ 	snd.postXmit(dataSent, true /* shouldScheduleProbe */)
+ }
++
++func rackDbg(what string, rtt, minRTT time.Duration, xmits uint32, cumulative bool) {
++	fmt.Fprintf(os.Stderr, "RACKDBG %s rtt=%v min=%v xmits=%d cumulative=%v\n", what, rtt, minRTT, xmits, cumulative)
++}
