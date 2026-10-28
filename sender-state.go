@@ -156,9 +156,10 @@ func (w *timeoutWatcher) record(now time.Time) {
 func (w *timeoutWatcher) stop() []time.Duration {
 	close(w.stopc)
 	<-w.done
-	// Why: in the 2026-10-27 runs, the 1 ms poll missed 3 of 1111 RTOs, all
-	// in end-of-transfer fetches, which end a few milliseconds after their
-	// RTO. Reading the counter once more when the fetch ends counts them.
+	// Why: the 1 ms poll missed 3 of the 3,721 RTOs in the 2026-10-27 runs,
+	// all in end-of-transfer fetches, which end a few milliseconds after
+	// their RTO. Reading the counter once more when the fetch ends counts
+	// them.
 	w.record(time.Now())
 	w.mu.Lock()
 	defer w.mu.Unlock()
