@@ -5,9 +5,13 @@ Each measured fetch becomes one benchmark line, named after its scenario, with
 the fetch time as sec/op and the fetch's RTO count as rtos/op, so that
 golang.org/x/perf/cmd/benchstat can compare two variants:
 
-  ./results-to-benchfmt.py results/2026-10-27/*-gvisor-master-pr15432-16081-rack-on.txt > before.txt
-  ./results-to-benchfmt.py results/2026-10-28/*-gvisor-master-pr15432-16081-tlpnew-rack-on.txt > after.txt
-  benchstat before.txt after.txt
+  ./results-to-benchfmt.py results/2026-10-28/paired/*-gvisor-master-pr15432-16081-rack-on.txt > base.txt
+  ./results-to-benchfmt.py results/2026-10-28/paired/*-gvisor-master-pr15432-16081-tlpnew-rack-on.txt > new.txt
+  benchstat base=base.txt new=new.txt
+
+Compare builds that ran side by side, such as the paired runs of
+run-paired-benchmarks.sh: builds that ran at different times also differ
+by drift in the machine's timing.
 
 Only the 24-trial scenarios in NAMES are converted. The long-lived scenario
 is left out because its fetches share one connection, so they are not
