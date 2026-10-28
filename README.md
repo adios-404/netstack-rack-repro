@@ -86,6 +86,7 @@ bin/repro-pin -rack=false -trace     # the same with RACK off
 ./run-linux-sender.sh -trace         # Linux kernel TCP (needs root or user namespaces)
 ./run-matrix.sh default              # one scenario, every variant, saved under results/
 ./run-paired-benchmarks.sh           # benchmark scenarios, builds interleaved, for benchstat
+e2e/build.sh && e2e/run-e2e.sh up && e2e/run-matrix-e2e.sh   # real tailscaled (root; e2e/README.md)
 ```
 
 The emulator spins for the last 2 ms before each delivery, so give each run
@@ -422,6 +423,21 @@ does not use the pairing. (The unpaired files' `TailLostProbeArrives` and
 `EndOfTransferTailLost` rows for the probe fix compare 2026-10-27 base runs
 with 2026-10-28 probe-fix runs; each file lists its inputs.)
 
+### End-to-end check with real tailscaled (2026-10-28)
+
+`e2e/` runs the `default` and `tail-tlp-survives` scenarios through two real
+`tailscaled` v1.104.2 nodes on a private Headscale tailnet. Their WireGuard
+packets cross the same emulated path, the response comes from netstack
+behind `tailscale serve`, and the client is Linux kernel TCP. Eight trials
+per row; `e2e/README.md` has the setup and the full tables.
+
+| server | tail and probe lost | tail lost, probe delivered |
+|---|---|---|
+| v1.104.2 as shipped (RACK on) | 4.04–6.59 s, all 8 over 1 s | 0.37–4.17 s, 5 of 8 over 1 s |
+| v1.104.2, `TS_NETSTACK_TCP_RACK=false` | 0.61–0.69 s | 0.42–0.72 s |
+| v1.104.2 + #15432 + #16081 | 0.62–0.72 s | 0.35–0.68 s; 5 of 8 wait for an RTO |
+| the same + TSecr fix + probe fix | 0.57–0.67 s | 0.36–0.47 s; none waits for an RTO |
+
 ## Limits
 
 - The loss is scripted and the path is simple: no Wi-Fi aggregation, no
@@ -434,7 +450,8 @@ with 2026-10-28 probe-fix runs; each file lists its inputs.)
 - The receiver is gVisor's TCP standing in for the client's kernel TCP
   (macOS in #21946), and the server accepts with gonet rather than through
   tailscaled's TCP forwarder. A real client's ACK, SACK and timestamp echo
-  can differ.
+  can differ. `e2e/` repeats two scenarios with real tailscaled and a Linux
+  kernel TCP client (above).
 - Before commits `a48eb27` and `113cb76`, the path delivered packets up to
   1.5 ms late, and the Linux sender was paced by BBR's init. Results from
   that harness are in the history, in commit `398ebf4`.

@@ -1,0 +1,120 @@
+From d58c2c48bda5bbef04ed19865028fb606c1dcd24 Mon Sep 17 00:00:00 2001
+From: Aditya Merchant <adityamerchant08@gmail.com>
+Date: Tue, 27 Oct 2026 15:09:52 +0000
+Subject: [PATCH] wgengine/netstack: add TS_NETSTACK_TCP_RACK to turn off RACK
+
+Since 1.104.0 (#21303), netstack's TCP uses gVisor's RACK-TLP loss
+detection again. In the gVisor that go.mod pins, RACK's loss marks do
+not reduce the SACK recovery pipe, and after an RTO, RACK starts fast
+recovery for the same flight, with ssthresh 2 and cwnd 5. After a
+burst loss, the sender can then retransmit about two segments per RTO
+for seconds to tens of seconds, and for minutes when the client does
+not offer TCP timestamps (Windows' default), because the RTO then
+keeps backing off. That stalls TCP that netstack terminates, such as
+tailscale serve, Tailscale SSH and tsnet, while kernel TCP over the
+same path does not stall.
+
+TS_NETSTACK_TCP_RACK=false brings back the RFC 6675 SACK loss recovery
+that netstack used from 1.82 through 1.102, until go.mod has a gVisor
+with the fixes (google/gvisor#15432 and google/gvisor#16081). Unset
+keeps gVisor's default, RACK on, because RACK off is several times
+slower on paths that reorder packets (#20893); TS_NETSTACK_TCP_RACK=true
+keeps it on explicitly.
+
+Updates #21946
+
+Signed-off-by: Aditya Merchant <adityamerchant08@gmail.com>
+---
+ wgengine/netstack/netstack.go      | 24 ++++++++++++++++++++++++
+ wgengine/netstack/netstack_test.go | 26 ++++++++++++++++++++++++++
+ 2 files changed, 50 insertions(+)
+
+diff --git a/wgengine/netstack/netstack.go b/wgengine/netstack/netstack.go
+index 0ecd9e280..894981aa5 100644
+--- a/wgengine/netstack/netstack.go
++++ b/wgengine/netstack/netstack.go
+@@ -138,6 +138,20 @@ func maxInFlightConnectionAttemptsPerClient() int {
+ // at the netstack default. Value is a Go duration, e.g. "15s".
+ var netstackKeepaliveInterval = envknob.RegisterDuration("TS_NETSTACK_KEEPALIVE_INTERVAL")
+ 
++// netstackTCPRACK overrides whether netstack's TCP uses RACK-TLP loss
++// detection (RFC 8985), which gVisor turns on by default. When false, TCP
++// falls back to RFC 6675 SACK loss recovery, as netstack did from 1.82
++// through 1.102.
++//
++// Why: until go.mod has google/gvisor#15432 and google/gvisor#16081, RACK's
++// loss marks do not reduce the SACK recovery pipe, and after an RTO, RACK
++// starts fast recovery for the same flight with a cwnd of 5. After a burst
++// loss the sender can then retransmit about two segments per RTO for seconds
++// to tens of seconds (tailscale/tailscale#21946). RACK off is in turn slower
++// on paths that reorder packets (tailscale/tailscale#20893), so unset keeps
++// gVisor's default.
++var netstackTCPRACK = envknob.RegisterOptBool("TS_NETSTACK_TCP_RACK")
++
+ var (
+ 	serviceIP   = tsaddr.TailscaleServiceIP()
+ 	serviceIPv6 = tsaddr.TailscaleServiceIPv6()
+@@ -394,6 +408,16 @@ func Create(logf logger.Logf, tundev *tstun.Wrapper, e wgengine.Engine, mc *magi
+ 	if tcpipErr != nil {
+ 		return nil, fmt.Errorf("could not set cubic congestion control: %v", tcpipErr)
+ 	}
++	if rack, ok := netstackTCPRACK().Get(); ok {
++		recovery := tcpip.TCPRecovery(0)
++		if rack {
++			recovery = tcpip.TCPRACKLossDetection
++		}
++		tcpipErr = ns.ipstack.SetTransportProtocolOption(tcp.ProtocolNumber, &recovery)
++		if tcpipErr != nil {
++			return nil, fmt.Errorf("could not set TCP loss recovery: %v", tcpipErr)
++		}
++	}
+ 	err := setTCPBufSizes(ns.ipstack)
+ 	if err != nil {
+ 		return nil, err
+diff --git a/wgengine/netstack/netstack_test.go b/wgengine/netstack/netstack_test.go
+index 6b82a8a03..f0b80f958 100644
+--- a/wgengine/netstack/netstack_test.go
++++ b/wgengine/netstack/netstack_test.go
+@@ -20,6 +20,7 @@
+ 	"gvisor.dev/gvisor/pkg/tcpip/network/ipv4"
+ 	"gvisor.dev/gvisor/pkg/tcpip/network/ipv6"
+ 	"gvisor.dev/gvisor/pkg/tcpip/stack"
++	"gvisor.dev/gvisor/pkg/tcpip/transport/tcp"
+ 	"gvisor.dev/gvisor/pkg/tcpip/transport/udp"
+ 	"gvisor.dev/gvisor/pkg/waiter"
+ 	"tailscale.com/envknob"
+@@ -965,6 +966,31 @@ func TestTCPForwardLimits_PerClient(t *testing.T) {
+ 	}
+ }
+ 
++// TestTCPRACKKnob verifies that TS_NETSTACK_TCP_RACK selects TCP loss
++// recovery, and that unset keeps gVisor's default, RACK.
++func TestTCPRACKKnob(t *testing.T) {
++	for _, tt := range []struct {
++		env  string
++		want tcpip.TCPRecovery
++	}{
++		{"", tcpip.TCPRACKLossDetection},
++		{"false", 0},
++		{"true", tcpip.TCPRACKLossDetection},
++	} {
++		t.Run("TS_NETSTACK_TCP_RACK="+tt.env, func(t *testing.T) {
++			envknob.SetenvForTest(t, "TS_NETSTACK_TCP_RACK", tt.env)
++			ns := makeNetstack(t, nil)
++			var got tcpip.TCPRecovery
++			if err := ns.ipstack.TransportProtocolOption(tcp.ProtocolNumber, &got); err != nil {
++				t.Fatalf("TransportProtocolOption: %v", err)
++			}
++			if got != tt.want {
++				t.Errorf("TCP loss recovery = %v, want %v", got, tt.want)
++			}
++		})
++	}
++}
++
+ // TestHandleLocalPackets tests the handleLocalPackets function, ensuring that
+ // we are properly deciding to handle packets that are destined for "local"
+ // IPs–addresses that are either for this node, or that it is responsible for.
+-- 
+2.43.0
+

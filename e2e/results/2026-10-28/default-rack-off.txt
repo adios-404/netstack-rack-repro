@@ -1,0 +1,27 @@
+variant rack-off, scenario default: {"keep_first":1000,"drop_count":1400,"window_ns":150000000,"until_gap_ns":0}
+server: 1.104.2-dev20261020
+trial 1 fetch 1 warm-up     0.421 s  2800000 bytes  HTTP 200
+trial 1 fetch 2 warm-up     0.378 s  2800000 bytes  HTTP 200
+trial 1 fetch 3 measured    0.666 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":39,"drop_phase_ms":245.759,"data_pkts_after_drop":1395,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":5.261,"last_data_s":0.655869197,"data_pkts_total":2434}
+trial 2 fetch 1 warm-up     0.368 s  2800000 bytes  HTTP 200
+trial 2 fetch 2 warm-up     0.352 s  2800000 bytes  HTTP 200
+trial 2 fetch 3 measured    0.606 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":39,"drop_phase_ms":204.693,"data_pkts_after_drop":1395,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":4.771,"last_data_s":0.598687237,"data_pkts_total":2434}
+trial 3 fetch 1 warm-up     0.436 s  2800000 bytes  HTTP 200
+trial 3 fetch 2 warm-up     0.395 s  2800000 bytes  HTTP 200
+trial 3 fetch 3 measured    0.666 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":34,"drop_phase_ms":206.562,"data_pkts_after_drop":1394,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":4.463,"last_data_s":0.656837717,"data_pkts_total":2428}
+trial 4 fetch 1 warm-up     0.421 s  2800000 bytes  HTTP 200
+trial 4 fetch 2 warm-up     0.375 s  2800000 bytes  HTTP 200
+trial 4 fetch 3 measured    0.686 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":37,"drop_phase_ms":205.144,"data_pkts_after_drop":1394,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":46.197,"last_data_s":0.675284544,"data_pkts_total":2431}
+trial 5 fetch 1 warm-up     0.390 s  2800000 bytes  HTTP 200
+trial 5 fetch 2 warm-up     0.377 s  2800000 bytes  HTTP 200
+trial 5 fetch 3 measured    0.693 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":37,"drop_phase_ms":207.406,"data_pkts_after_drop":1393,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":47.244,"last_data_s":0.684612783,"data_pkts_total":2430}
+trial 6 fetch 1 warm-up     0.407 s  2800000 bytes  HTTP 200
+trial 6 fetch 2 warm-up     0.358 s  2800000 bytes  HTTP 200
+trial 6 fetch 3 measured    0.653 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":42,"drop_phase_ms":252.601,"data_pkts_after_drop":1395,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":4.241,"last_data_s":0.645110372,"data_pkts_total":2437}
+trial 7 fetch 1 warm-up     0.337 s  2800000 bytes  HTTP 200
+trial 7 fetch 2 warm-up     0.335 s  2800000 bytes  HTTP 200
+trial 7 fetch 3 measured    0.624 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":48,"drop_phase_ms":250.301,"data_pkts_after_drop":1396,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":4.221,"last_data_s":0.616944937,"data_pkts_total":2444}
+trial 8 fetch 1 warm-up     0.447 s  2800000 bytes  HTTP 200
+trial 8 fetch 2 warm-up     0.379 s  2800000 bytes  HTTP 200
+trial 8 fetch 3 measured    0.650 s  2800000 bytes  HTTP 200  bridge {"armed":true,"started":true,"kept_before_drop":1000,"dropped":35,"drop_phase_ms":206.701,"data_pkts_after_drop":1385,"silences_over_100ms_after_drop":0,"longest_gap_after_drop_ms":4.257,"last_data_s":0.642032189,"data_pkts_total":2420}
+tsa drops: tx dropped 0
