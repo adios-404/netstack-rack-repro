@@ -145,9 +145,9 @@ Between the two, no packet that the endpoints send changed; `a7828ed` fixed
 how the trace counts retransmissions when a connection reuses an earlier
 one's client port.
 
-RACK off (`-rack=false`) sets `TCPRecovery(0)`, as Tailscale did before
-1.104.0, and as a `TS_NETSTACK_TCP_RACK=false` switch proposed for Tailscale
-would. The scenarios: `default` loses the tail and the loss probe;
+RACK off (`-rack=false`) sets `TCPRecovery(0)`, as Tailscale 1.82 through
+1.102 did, and as a `TS_NETSTACK_TCP_RACK=false` switch proposed for
+Tailscale would. The scenarios: `default` loses the tail and the loss probe;
 `tail-tlp-survives` loses the tail, and the probe and everything after it
 arrive; `tail-tlp-survives-no-ts` is the same with a client that does not
 offer TCP timestamps; `mid-flight-hole` loses 16 packets with later ones
@@ -157,7 +157,7 @@ arriving; `end-of-transfer` and `end-of-transfer-no-ts` are below.
 |---|---|---|---|---|
 | gVisor pin, RACK on (Tailscale 1.104.x) | 3.54–6.03 s (15–27 RTOs) | 3.52–5.82 s (15–26 RTOs) | 0.30 s, but 4 of 8 unfinished at 120 s (0–9 RTOs) | 0.30–0.32 s (0 RTOs) |
 | gVisor pin, RACK on, no GSO | 3.76–11.2 s (16–52 RTOs) | 3.54–51.3 s (15–245 RTOs) | 0.30 s, but 1 of 8 unfinished at 120 s (0–9 RTOs) | 0.30–0.33 s (0 RTOs) |
-| gVisor pin, RACK off (as before 1.104.0) | 0.52–0.55 s (1 RTO) | 0.32–0.56 s (0–1 RTOs) | 0.30–0.52 s (0–1 RTOs) | 0.30–0.32 s (0 RTOs) |
+| gVisor pin, RACK off (as in 1.82–1.102) | 0.52–0.55 s (1 RTO) | 0.32–0.56 s (0–1 RTOs) | 0.30–0.52 s (0–1 RTOs) | 0.30–0.32 s (0 RTOs) |
 | pin + #15432 | 0.64–0.66 s (1 RTO) | 0.32–0.65 s (0–1 RTOs) | 0.30–1.22 s (0–1 RTOs) | 0.30–0.33 s (0 RTOs) |
 | pin + #16081 | 0.54–0.57 s (1 RTO) | 0.53–0.55 s (1 RTO) | 0.30–0.56 s (0–1 RTOs) | 0.30–0.33 s (0 RTOs) |
 | pin + #15432 + #16081 | 0.53–0.57 s (1 RTO) | 0.33–0.58 s (0–1 RTOs) | 0.30–0.56 s (0–1 RTOs) | 0.30–0.33 s (0 RTOs) |
@@ -183,7 +183,7 @@ to 7 in the raw output after the two warm-ups):
 |---|---|
 | gVisor pin, RACK on (Tailscale 1.104.x) | 3.53, 42.1, 47.3, 48.7, 50.4 s |
 | gVisor pin, RACK on, no GSO | 4.16, 39.2, 39.4, 45.8, 47.5 s |
-| gVisor pin, RACK off (as before 1.104.0) | 0.54, 0.55, 0.55, 0.56, 0.56 s |
+| gVisor pin, RACK off (as in 1.82–1.102) | 0.54, 0.55, 0.55, 0.56, 0.56 s |
 | pin + #15432 | 0.67, 0.91, 0.90, 0.89, 0.89 s |
 | pin + #16081 | 0.54, 0.54, 0.55, 0.56, 0.56 s |
 | pin + #15432 + #16081 | 0.55, 0.55, 0.58, 0.56, 0.56 s |
@@ -219,7 +219,7 @@ The same scenario with eight trials:
 |---|---|---|---|
 | gVisor pin, RACK on (Tailscale 1.104.x) | 8 | 3.52–5.82 s, median 3.94 s | 0 of 8 |
 | gVisor pin, RACK on, no GSO | 8 | 3.54–51.3 s, median 3.94 s | 0 of 8 |
-| gVisor pin, RACK off (as before 1.104.0) | 8 | 0.32–0.56 s, median 0.53 s | 1 of 8 |
+| gVisor pin, RACK off (as in 1.82–1.102) | 8 | 0.32–0.56 s, median 0.53 s | 1 of 8 |
 | pin + #15432 | 8 | 0.32–0.65 s, median 0.64 s | 1 of 8 |
 | pin + #16081 | 8 | 0.53–0.55 s, median 0.54 s | 0 of 8 |
 | pin + #15432 + #16081 | 8 | 0.33–0.58 s, median 0.54 s | 1 of 8 |
