@@ -24,7 +24,7 @@ def ms(x):
 
 
 runs = defaultdict(list)
-run, events = None, []
+run, events, pending = None, [], None
 for line in open(sys.argv[1], encoding='utf-8'):
     if line.startswith('=== '):
         run, events = line[4:].strip(), []
@@ -35,8 +35,19 @@ for line in open(sys.argv[1], encoding='utf-8'):
         continue
     m = re.match(r'trial (\d+) fetch \d+ measured +([\d.]+) s .*RTOs +(\d+)', line)
     if m:
-        runs[run].append((int(m.group(3)), events))
+        runs[run].append([int(m.group(3)), events])
         events = []
+        pending = runs[run][-1]
+        continue
+    # Why: the trial line's RTOs field polls gVisor's Timeouts counter and
+    # missed 2 RTOs in these logs, in fetches that ended a few milliseconds
+    # after their RTO. The stats line right after it has the counter itself.
+    # Later stats lines can belong to the next trial's warm-up fetches, whose
+    # trial lines the logs leave out.
+    m = re.search(r'gVisor stats: .*timeouts (\d+)', line)
+    if m and pending is not None:
+        pending[0] = int(m.group(1))
+        pending = None
 
 for run, trials in runs.items():
     kinds = Counter()
