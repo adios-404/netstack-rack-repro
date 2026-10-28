@@ -126,8 +126,9 @@ The two proposed changes:
   while the congestion window has room, so after a tail loss the probe is a
   retransmission, whose SACK RACK can ignore as ambiguous. The fix sends new
   data whenever there is some and the receive window allows, even with the
-  congestion window full, but at most one segment past it, as RFC 8985
-  (sections 7.3 and 9.3) and Linux's `tcp_send_loss_probe` do.
+  congestion window full, but at most one segment past it, and sends no
+  further probe while one is unacknowledged, as RFC 8985 (sections 7.3 and
+  9.3) and Linux's `tcp_send_loss_probe` do.
 
 `gvisor-go-test-overlay.sh` builds a tree in which gVisor's own TCP test
 suites run under `go test`, without Bazel: the `go` branch export of a master
