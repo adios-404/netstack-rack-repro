@@ -1,0 +1,22 @@
+$ ./results-to-benchfmt.py results/2026-10-28/paired/{tail-tlp-survives-24-trials,end-of-transfer,default-24-trials,mid-flight-hole-24-trials}-gvisor-<build>-rack-on.txt > <build>.txt
+$ benchstat "#15432+#16081=master-pr15432-16081.txt" "+this change=master-pr15432-16081-tlpnew.txt"
+goos: linux
+pkg: netstack-rack-repro
+                      │ #15432+#16081 │            +this change             │
+                      │    sec/op     │   sec/op     vs base                │
+TailLostProbeArrives      549.0m ± 1%   335.0m ± 1%  -38.98% (p=0.000 n=24)
+EndOfTransferTailLost     221.0m ± 0%   221.0m ± 0%        ~ (p=0.969 n=24)
+TailAndProbeLost          552.5m ± 1%   544.0m ± 1%   -1.54% (p=0.008 n=24)
+HoleMidFlight             313.0m ± 1%   312.5m ± 2%        ~ (p=0.678 n=24)
+geomean                   380.6m        334.9m       -11.99%
+
+                      │ #15432+#16081 │              +this change               │
+                      │    rtos/op    │  rtos/op    vs base                     │
+TailLostProbeArrives     1.000 ± 0%     0.000 ± 0%  -100.00% (p=0.000 n=24)
+EndOfTransferTailLost    1.000 ± 0%     1.000 ± 0%         ~ (p=1.000 n=24) ¹
+TailAndProbeLost         1.000 ± 0%     1.000 ± 0%         ~ (p=1.000 n=24) ¹
+HoleMidFlight            0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=24) ¹
+geomean                             ²               ?                       ² ³
+¹ all samples are equal
+² summaries must be >0 to compute geomean
+³ ratios must be >0 to compute geomean

@@ -1,0 +1,42 @@
+$ benchstat base=master-pr15432-16081.txt tsecr=master-pr15432-16081-tsecr.txt probe=master-pr15432-16081-tlpnew.txt both=master-pr15432-16081-tsecr-tlpnew.txt
+goos: linux
+pkg: netstack-rack-repro
+                      │     base     │                 tsecr                 │                probe                 │                both                 │
+                      │    sec/op    │    sec/op      vs base                │    sec/op     vs base                │   sec/op     vs base                │
+TailLostProbeArrives     549.0m ± 1%   340.5m ±   1%  -37.98% (p=0.000 n=24)    335.0m ± 1%  -38.98% (p=0.000 n=24)   338.0m ± 1%  -38.43% (p=0.000 n=24)
+EndOfTransferTailLost   221.00m ± 0%   21.50m ± 928%  -90.27% (p=0.001 n=24)   221.00m ± 0%        ~ (p=0.969 n=24)   20.50m ± 7%  -90.72% (p=0.000 n=24)
+TailAndProbeLost         552.5m ± 1%   553.0m ±   1%        ~ (p=0.923 n=24)    544.0m ± 1%   -1.54% (p=0.008 n=24)   547.0m ± 1%        ~ (p=0.071 n=24)
+HoleMidFlight            313.0m ± 1%   315.0m ±   3%        ~ (p=0.183 n=24)    312.5m ± 2%        ~ (p=0.678 n=24)   315.0m ± 2%        ~ (p=0.123 n=24)
+geomean                  380.6m        189.0m         -50.35%                   334.9m       -11.99%                  185.9m       -51.16%
+
+                      │     base     │                  tsecr                  │                  probe                  │                  both                   │
+                      │   rtos/op    │  rtos/op    vs base                     │  rtos/op    vs base                     │  rtos/op    vs base                     │
+TailLostProbeArrives    1.000 ± 0%     0.000 ± 0%  -100.00% (p=0.000 n=24)       0.000 ± 0%  -100.00% (p=0.000 n=24)       0.000 ± 0%  -100.00% (p=0.000 n=24)
+EndOfTransferTailLost   1.000 ± 0%     0.000 ±  ?  -100.00% (p=0.000 n=24)       1.000 ± 0%         ~ (p=1.000 n=24) ¹     0.000 ± 0%  -100.00% (p=0.000 n=24)
+TailAndProbeLost        1.000 ± 0%     1.000 ± 0%         ~ (p=1.000 n=24) ¹     1.000 ± 0%         ~ (p=1.000 n=24) ¹     1.000 ± 0%         ~ (p=1.000 n=24) ¹
+HoleMidFlight           0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=24) ¹     0.000 ± 0%         ~ (p=1.000 n=24) ¹     0.000 ± 0%         ~ (p=1.000 n=24) ¹
+geomean                            ²               ?                       ² ³               ?                       ² ³               ?                       ² ³
+¹ all samples are equal
+² summaries must be >0 to compute geomean
+³ ratios must be >0 to compute geomean
+
+$ benchstat "tsecr=master-pr15432-16081-tsecr.txt" "both=master-pr15432-16081-tsecr-tlpnew.txt"
+goos: linux
+pkg: netstack-rack-repro
+                      │     tsecr     │                both                │
+                      │    sec/op     │   sec/op     vs base               │
+TailLostProbeArrives    340.5m ±   1%   338.0m ± 1%       ~ (p=0.556 n=24)
+EndOfTransferTailLost   21.50m ± 928%   20.50m ± 7%       ~ (p=0.080 n=24)
+TailAndProbeLost        553.0m ±   1%   547.0m ± 1%       ~ (p=0.148 n=24)
+HoleMidFlight           315.0m ±   3%   315.0m ± 2%       ~ (p=0.818 n=24)
+geomean                 189.0m          185.9m       -1.63%
+
+                      │    tsecr     │                both                 │
+                      │   rtos/op    │  rtos/op    vs base                 │
+TailLostProbeArrives    0.000 ± 0%     0.000 ± 0%       ~ (p=1.000 n=24) ¹
+EndOfTransferTailLost   0.000 ±  ?     0.000 ± 0%       ~ (p=0.341 n=24)
+TailAndProbeLost        1.000 ± 0%     1.000 ± 0%       ~ (p=1.000 n=24) ¹
+HoleMidFlight           0.000 ± 0%     0.000 ± 0%       ~ (p=1.000 n=24) ¹
+geomean                            ²               +0.00%                ²
+¹ all samples are equal
+² summaries must be >0 to compute geomean

@@ -1,0 +1,43 @@
+$ benchstat "#15432+#16081=master-pr15432-16081.txt" "+this change=master-pr15432-16081-tlpnew.txt"
+goos: linux
+pkg: netstack-rack-repro
+                      │ #15432+#16081 │            +this change             │
+                      │    sec/op     │   sec/op     vs base                │
+TailLostProbeArrives      546.5m ± 1%   336.5m ± 3%  -38.43% (p=0.000 n=24)
+EndOfTransferTailLost     220.0m ± 0%   221.0m ± 0%        ~ (p=0.237 n=24)
+TailAndProbeLost          551.5m ± 1%   553.5m ± 1%        ~ (p=0.223 n=24)
+HoleMidFlight             320.0m ± 2%   320.5m ± 3%        ~ (p=0.354 n=24)
+geomean                   381.7m        338.9m       -11.20%
+
+                      │ #15432+#16081 │              +this change               │
+                      │    rtos/op    │  rtos/op    vs base                     │
+TailLostProbeArrives     1.000 ± 0%     0.000 ± 0%  -100.00% (p=0.000 n=24)
+EndOfTransferTailLost    1.000 ± 0%     1.000 ± 0%         ~ (p=1.000 n=24) ¹
+TailAndProbeLost         1.000 ± 0%     1.000 ± 0%         ~ (p=1.000 n=24) ¹
+HoleMidFlight            0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=24) ¹
+geomean                             ²               ?                       ² ³
+¹ all samples are equal
+² summaries must be >0 to compute geomean
+³ ratios must be >0 to compute geomean
+
+$ benchstat "#15432+#16081+TSecr fix=master-pr15432-16081-tsecr.txt" "+this change=master-pr15432-16081-tsecr-tlpnew.txt"
+goos: linux
+pkg: netstack-rack-repro
+                      │ #15432+#16081+TSecr fix │             +this change              │
+                      │         sec/op          │    sec/op      vs base                │
+TailLostProbeArrives                335.0m ± 2%   339.0m ±   3%        ~ (p=0.955 n=24)
+EndOfTransferTailLost              220.00m ± 0%   20.50m ± 973%  -90.68% (p=0.024 n=24)
+TailAndProbeLost                    556.0m ± 2%   545.5m ±   2%   -1.89% (p=0.006 n=24)
+HoleMidFlight                       323.0m ± 3%   315.5m ±   2%   -2.32% (p=0.007 n=24)
+geomean                             339.2m        186.0m         -45.17%
+
+                      │ #15432+#16081+TSecr fix │              +this change               │
+                      │         rtos/op         │  rtos/op    vs base                     │
+TailLostProbeArrives               0.000 ± 0%     0.000 ± 0%         ~ (p=0.489 n=24)
+EndOfTransferTailLost              1.000 ± 0%     0.000 ±  ?  -100.00% (p=0.003 n=24)
+TailAndProbeLost                   1.000 ± 0%     1.000 ± 0%         ~ (p=1.000 n=24) ¹
+HoleMidFlight                      0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=24) ¹
+geomean                                       ²               ?                       ² ³
+¹ all samples are equal
+² summaries must be >0 to compute geomean
+³ ratios must be >0 to compute geomean
