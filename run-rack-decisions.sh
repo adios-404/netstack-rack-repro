@@ -4,9 +4,11 @@
 # logs every RACK decision on a retransmitted segment to stderr
 # (patches/diagnostic-log-rack-decisions.patch), and runs them in the
 # end-of-transfer and tail-probe scenarios with several jitter seeds. Writes
-# results/2026-10-27/rack-decisions/*.log; summarize one with
+# results/<UTC date>/rack-decisions/*.log (the README's figures come from
+# results/2026-10-27/rack-decisions/); summarize one with
 # ./parse-rack-decisions.py <log>. Diagnostic only: the binaries also print
-# the client stack's RACK decisions, and nothing else changes.
+# the client stack's RACK decisions and every new minimum RTT, and nothing
+# else changes.
 #
 # Usage: ./run-rack-decisions.sh   (give it two CPUs, as run-matrix.sh says)
 set -euo pipefail
@@ -36,7 +38,7 @@ build tsecr patches/master-tsecr-fix-code.patch patches/diagnostic-log-rack-deci
 build upstream-tsecr patches/master-pr-15432-16081-code.patch patches/master-tsecr-fix-code.patch \
   patches/diagnostic-log-rack-decisions.patch
 
-out=results/2026-10-27/rack-decisions
+out="results/$(date -u +%Y-%m-%d)/rack-decisions"
 mkdir -p "$out"
 eot=(-size 14400 -burst-keep-first 8 -burst-drop 4 -burst-window 0)
 # Why: keep only what parse-rack-decisions.py reads; the per-100 ms traces
