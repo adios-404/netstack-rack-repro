@@ -1,3 +1,17 @@
+Unpaired runs: each build ran as one 24-trial process, the builds one after
+another, so drift in the machine's timing between runs can show up as a
+difference between builds. run-paired-benchmarks.sh spreads such drift over
+all builds; see benchstat-tsecr-fix.txt and benchstat-probe-fix.txt.
+Inputs, converted with results-to-benchfmt.py:
+  base:         results/2026-10-27/{tail-tlp-survives-24-trials,end-of-transfer}-gvisor-master-pr15432-16081-rack-on.txt
+                results/2026-10-28/{default-24-trials,mid-flight-hole-24-trials}-gvisor-master-pr15432-16081-rack-on.txt
+  +this change: results/2026-10-28/{tail-tlp-survives-24-trials,end-of-transfer,default-24-trials,mid-flight-hole-24-trials}-gvisor-master-pr15432-16081-tlpnew-rack-on.txt
+  (so the TailLostProbeArrives and EndOfTransferTailLost rows compare runs
+  made on different days)
+  +TSecr fix and +TSecr fix + this change: as above, for
+  gvisor-master-pr15432-16081-tsecr-rack-on (2026-10-27 and 2026-10-28)
+  and gvisor-master-pr15432-16081-tsecr-tlpnew-rack-on (2026-10-28)
+
 $ benchstat "#15432+#16081=master-pr15432-16081.txt" "+this change=master-pr15432-16081-tlpnew.txt"
 goos: linux
 pkg: netstack-rack-repro
