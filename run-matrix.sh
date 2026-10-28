@@ -38,9 +38,12 @@
 #   end-of-transfer-no-ts
 #                      end-of-transfer with a client that does not offer TCP
 #                      timestamps. 8 trials.
+#   default-24-trials, mid-flight-hole-24-trials
+#                      default and mid-flight-hole with 24 trials, for
+#                      results-to-benchfmt.py and benchstat.
 set -euo pipefail
 cd "$(dirname "$0")"
-scenario="${1:?scenario: default, long-lived, tail-tlp-survives, mid-flight-hole, tail-tlp-survives-no-ts, tail-tlp-survives-24-trials, end-of-transfer or end-of-transfer-no-ts}"
+scenario="${1:?scenario: default, long-lived, tail-tlp-survives, mid-flight-hole, tail-tlp-survives-no-ts, tail-tlp-survives-24-trials, end-of-transfer, end-of-transfer-no-ts, default-24-trials or mid-flight-hole-24-trials}"
 shift
 case "$scenario" in
 default) flags=(-trials 8) ;;
@@ -54,6 +57,8 @@ tail-tlp-survives-24-trials) flags=(-trials 24 -burst-drop 100000 -burst-window 
 # 14,736 bytes gVisor sent a 13th packet, which arrived above the hole.
 end-of-transfer) flags=(-trials 24 -size 14400 -burst-keep-first 8 -burst-drop 4 -burst-window 0) ;;
 end-of-transfer-no-ts) flags=(-trials 8 -size 14400 -burst-keep-first 8 -burst-drop 4 -burst-window 0 -client-timestamps=false) ;;
+default-24-trials) flags=(-trials 24) ;;
+mid-flight-hole-24-trials) flags=(-trials 24 -burst-drop 16 -burst-window 0) ;;
 *)
   echo "unknown scenario: $scenario" >&2
   exit 2
