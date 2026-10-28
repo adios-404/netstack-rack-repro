@@ -119,16 +119,16 @@ type timeoutWatcher struct {
 
 	mu    sync.Mutex
 	t0    time.Time
+	last  uint64
 	times []time.Duration
 	stopc chan struct{}
 	done  chan struct{}
 }
 
 func watchTimeouts(s *stack.Stack, t0 time.Time) *timeoutWatcher {
-	w := &timeoutWatcher{stack: s, t0: t0, stopc: make(chan struct{}), done: make(chan struct{})}
+	w := &timeoutWatcher{stack: s, t0: t0, last: s.Stats().TCP.Timeouts.Value(), stopc: make(chan struct{}), done: make(chan struct{})}
 	go func() {
 		defer close(w.done)
-		last := s.Stats().TCP.Timeouts.Value()
 		tick := time.NewTicker(time.Millisecond)
 		defer tick.Stop()
 		for {
@@ -136,21 +136,30 @@ func watchTimeouts(s *stack.Stack, t0 time.Time) *timeoutWatcher {
 			case <-w.stopc:
 				return
 			case now := <-tick.C:
-				v := s.Stats().TCP.Timeouts.Value()
-				w.mu.Lock()
-				for ; last < v; last++ {
-					w.times = append(w.times, now.Sub(t0))
-				}
-				w.mu.Unlock()
+				w.record(now)
 			}
 		}
 	}()
 	return w
 }
 
+// record adds now as the time of each RTO since the last call.
+func (w *timeoutWatcher) record(now time.Time) {
+	v := w.stack.Stats().TCP.Timeouts.Value()
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	for ; w.last < v; w.last++ {
+		w.times = append(w.times, now.Sub(w.t0))
+	}
+}
+
 func (w *timeoutWatcher) stop() []time.Duration {
 	close(w.stopc)
 	<-w.done
+	// Why: in the 2026-10-27 runs, the 1 ms poll missed 3 of 1111 RTOs, all
+	// in end-of-transfer fetches, which end a few milliseconds after their
+	// RTO. Reading the counter once more when the fetch ends counts them.
+	w.record(time.Now())
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	return append([]time.Duration(nil), w.times...)

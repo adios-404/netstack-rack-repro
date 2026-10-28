@@ -227,20 +227,22 @@ func kernelInfo(c net.Conn) (*unix.TCPInfo, error) {
 
 // kernelRTOWatcher polls TCP_INFO and records when tcpi_total_rto increases.
 type kernelRTOWatcher struct {
+	c     net.Conn
+	t0    time.Time
 	mu    sync.Mutex
+	last  uint16
 	times []time.Duration
 	stopc chan struct{}
 	done  chan struct{}
 }
 
 func watchKernelRTOs(c net.Conn, t0 time.Time) *kernelRTOWatcher {
-	w := &kernelRTOWatcher{stopc: make(chan struct{}), done: make(chan struct{})}
+	w := &kernelRTOWatcher{c: c, t0: t0, stopc: make(chan struct{}), done: make(chan struct{})}
+	if info, err := kernelInfo(c); err == nil {
+		w.last = info.Total_rto
+	}
 	go func() {
 		defer close(w.done)
-		var last uint16
-		if info, err := kernelInfo(c); err == nil {
-			last = info.Total_rto
-		}
 		tick := time.NewTicker(time.Millisecond)
 		defer tick.Stop()
 		for {
@@ -248,24 +250,32 @@ func watchKernelRTOs(c net.Conn, t0 time.Time) *kernelRTOWatcher {
 			case <-w.stopc:
 				return
 			case now := <-tick.C:
-				info, err := kernelInfo(c)
-				if err != nil {
-					continue
-				}
-				w.mu.Lock()
-				for ; last < info.Total_rto; last++ {
-					w.times = append(w.times, now.Sub(t0))
-				}
-				w.mu.Unlock()
+				w.record(now)
 			}
 		}
 	}()
 	return w
 }
 
+// record adds now as the time of each RTO since the last call.
+func (w *kernelRTOWatcher) record(now time.Time) {
+	info, err := kernelInfo(w.c)
+	if err != nil {
+		return
+	}
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	for ; w.last < info.Total_rto; w.last++ {
+		w.times = append(w.times, now.Sub(w.t0))
+	}
+}
+
 func (w *kernelRTOWatcher) stop() []time.Duration {
 	close(w.stopc)
 	<-w.done
+	// Why: the 1 ms poll can miss an RTO shortly before the fetch ends, as it
+	// did for gVisor senders (see timeoutWatcher.stop).
+	w.record(time.Now())
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	return append([]time.Duration(nil), w.times...)
