@@ -64,13 +64,14 @@ index 1bcec67..037a7f9 100644
  		return
  	}
 diff --git a/pkg/tcpip/transport/tcp/snd.go b/pkg/tcpip/transport/tcp/snd.go
-index 15a6a18..26a2455 100644
+index 15a6a18..24fc2e1 100644
 --- a/pkg/tcpip/transport/tcp/snd.go
 +++ b/pkg/tcpip/transport/tcp/snd.go
-@@ -574,6 +574,7 @@ func (s *sender) retransmitTimerExpired() tcpip.Error {
+@@ -574,6 +574,8 @@ func (s *sender) retransmitTimerExpired() tcpip.Error {
  	// Set TLPRxtOut to false according to
  	// https://tools.ietf.org/html/draft-ietf-tcpm-rack-08#section-7.6.1.
  	s.rc.tlpRxtOut = false
++	// The RTO also ends the wait for a probe that sent new data.
 +	s.rc.tlpNewDataOut = false
  
  	// Give up if we've waited more than a minute since the last resend or
