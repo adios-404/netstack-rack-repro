@@ -178,7 +178,8 @@ gVisor's counter.
 
 RACK off (`-rack=false`) sets `TCPRecovery(0)`, as Tailscale 1.82 through
 1.102 did, and as a `TS_NETSTACK_TCP_RACK=false` switch proposed for
-Tailscale would. The scenarios: `default` loses the tail and the loss probe;
+Tailscale ([tailscale/tailscale#22045](https://github.com/tailscale/tailscale/pull/22045))
+would. The scenarios: `default` loses the tail and the loss probe;
 `tail-tlp-survives` loses the tail, and the probe and everything after it
 arrive; `tail-tlp-survives-no-ts` is the same with a client that does not
 offer TCP timestamps; `mid-flight-hole` loses 16 packets with later ones
