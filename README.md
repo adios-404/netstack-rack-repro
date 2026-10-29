@@ -121,7 +121,8 @@ proposed here, not upstream code.
 
 The two proposed changes:
 
-- **TSecr fix.** `rackControl.update` skips an ACK of a retransmitted
+- **TSecr fix** ([#16659](https://github.com/google/gvisor/pull/16659)).
+  `rackControl.update` skips an ACK of a retransmitted
   segment when the ACK's TSecr is older than the retransmission. A receiver
   echoes the timestamp of the most recent segment that advanced the left
   edge of its window (RCV.NXT; RFC 7323, section 4.3), so an ACK that SACKs
@@ -134,7 +135,8 @@ The two proposed changes:
   (`tcp_skb_spurious_retrans`) covers cumulatively acknowledged segments,
   and a SACKed one passes to `tcp_rack_advance`, which checks only the
   minimum RTT.
-- **Probe fix.** `probeTimerExpired` sends new data as the loss probe only
+- **Probe fix** ([#16660](https://github.com/google/gvisor/pull/16660)).
+  `probeTimerExpired` sends new data as the loss probe only
   while the congestion window has room, so after a tail loss the probe is a
   retransmission, whose SACK RACK can ignore as ambiguous. The fix sends new
   data whenever there is some and the receive window allows, even with the
