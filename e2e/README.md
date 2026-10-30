@@ -42,7 +42,9 @@ Scenarios, as in the parent harness:
 Server variants:
 
 - `shipped`: v1.104.2 plus the `TS_NETSTACK_TCP_RACK` knob, unset, so RACK
-  is on, as shipped.
+  is on, as shipped. This is the knob as proposed in
+  tailscale/tailscale#22045; Tailscale merged it as `TS_NETSTACK_ENABLE_RACK`
+  in tailscale/tailscale#22069.
 - `rack-off`: the same binary with `TS_NETSTACK_TCP_RACK=false`.
 - `pr15432-16081`: the same with google/gvisor#15432 and #16081 applied to
   the gVisor that v1.104.2 pins (`../patches/pin-1-*`, `pin-2-*`).
