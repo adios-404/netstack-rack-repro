@@ -86,6 +86,7 @@ bin/repro-pin -rack=false -trace     # the same with RACK off
 ./run-linux-sender.sh -trace         # Linux kernel TCP (needs root or user namespaces)
 ./run-matrix.sh default              # one scenario, every variant, saved under results/
 ./run-paired-benchmarks.sh           # benchmark scenarios, builds interleaved, for benchstat
+./run-revision-check.sh              # the same, first vs revised fixes after review
 e2e/build.sh && e2e/run-e2e.sh up && e2e/run-matrix-e2e.sh   # real tailscaled (root; e2e/README.md)
 ```
 
@@ -148,7 +149,7 @@ The two proposed changes:
 suites run under `go test`, without Bazel: the `go` branch export of a
 master commit, plus that commit's test files.
 
-## Results (2026-10-27 and 2026-10-28)
+## Results (2026-10-27 to 2026-10-30)
 
 Eight trials per cell, each on a new connection, unless noted. Each cell
 gives the fetch times (min–max) and the RTOs per fetch; a dash means the
@@ -444,6 +445,50 @@ per row; `e2e/README.md` has the setup and the full tables.
 | v1.104.2, `TS_NETSTACK_TCP_RACK=false` | 0.61–0.69 s | 0.42–0.72 s |
 | v1.104.2 + #15432 + #16081 | 0.62–0.72 s | 0.35–0.68 s; 5 of 8 wait for an RTO |
 | the same + TSecr fix + probe fix | 0.57–0.67 s | 0.36–0.47 s; none waits for an RTO |
+
+### Revised fixes after review (2026-10-30)
+
+Review on google/gvisor#16659 and #16660 found three edge cases, and both
+fixes changed (`patches/master-tsecr-fix-revised-code.patch` and
+`master-tlp-new-data-revised-code.patch`): the TSecr fix skips the TSecr
+test only for a retransmission that SACK blocks cover entirely, and the
+probe fix schedules no probe timer while a probe is out and does not let an
+ACK of data not yet sent end a new-data probe. `run-revision-check.sh`
+compares the first and revised versions (builds ending in `2`) as
+`run-paired-benchmarks.sh` does: 24 trials per scenario and build,
+interleaved trial by trial. It ran on a Linux arm64 virtual machine, with
+binaries cross-built from the same patches, so its times are not
+comparable with the tables above; compare builds within it. Raw output and
+benchstat files: `results/2026-10-30/`.
+
+| with #15432 + #16081 | `TailLostProbeArrives`: no RTO, median | `EndOfTransferTailLost`: no RTO, median |
+|---|---|---|
+| neither fix | 0 of 24, 0.534 s | 0 of 24, 0.221 s |
+| TSecr fix, first / revised | 19 / 17 of 24, 0.325 / 0.328 s | 21 / 21 of 24, 0.021 / 0.021 s |
+| probe fix, first / revised | 24 / 24 of 24, 0.325 / 0.323 s | 0 / 0 of 24, 0.221 / 0.222 s |
+| both, first / revised | 24 / 24 of 24, 0.324 / 0.325 s | 21 / 24 of 24, 0.020 / 0.021 s |
+
+In `TailAndProbeLost` every build waited for one RTO (medians 0.532–0.534
+s), and in `HoleMidFlight` none did (0.301–0.303 s). benchstat finds no
+significant difference between the first and revised versions in any
+scenario, except the probe fix in `TailLostProbeArrives`, 0.77% faster when
+revised (p=0.007; `benchstat-revision-*.txt`). The no-RTO counts differ by
+up to three trials between versions, in both directions (Fisher's exact
+test, p ≥ 0.23). Against #15432 + #16081 alone, the revised TSecr fix cuts
+`TailLostProbeArrives` by 38.61% and `EndOfTransferTailLost` by 90.50%, and
+the revised probe fix cuts `TailLostProbeArrives` by 39.55%
+(`benchstat-revised-*.txt`); the first versions' runs above give 37.98%,
+90.27% and 38.98%. On master alone, at the end of a transfer, 0 of 24
+fetches avoided an RTO, 21 of 24 with the first TSecr fix and 19 of 24 with
+the revised one (medians 0.221, 0.023 and 0.024 s).
+
+With RACK's decisions logged (`rack-decisions/`, 48 fetches per version
+with the tail lost and the probe delivered), the first TSecr fix avoided
+the RTO in 31 fetches and the revised one in 33. In every fetch that waited
+for an RTO, RACK rejected the probe's sample with the minimum RTT test,
+0.002–0.239 ms below the minimum, as above. Neither version rejected a
+SACKed sample with the TSecr test; all its rejections were of cumulatively
+acknowledged segments, which both versions treat alike.
 
 ## Limits
 

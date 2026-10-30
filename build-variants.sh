@@ -23,6 +23,10 @@
 #   bin/repro-master-pr15432-16081-tsecr  + both + the RACK TSecr fix
 #   bin/repro-master-pr15432-16081-tlpnew  + both + the loss-probe new-data fix
 #   bin/repro-master-pr15432-16081-tsecr-tlpnew  + both + both proposed fixes
+#   bin/repro-master-tsecr2, bin/repro-master-pr15432-16081-tsecr2,
+#   bin/repro-master-pr15432-16081-tlpnew2, bin/repro-master-pr15432-16081-tsecr2-tlpnew2
+#                                the same with the revised versions of the two
+#                                fixes, after review (*-revised-code.patch)
 #   bin/repro-master-pr16495     + google/gvisor#16495 (no new recovery after an RTO
 #                                that interrupts SACK recovery)
 #   bin/repro-master-pr15432-16081-16495-16419
@@ -36,7 +40,8 @@
 # line, and the stack keeps both guards: s.state != tcpip.RTORecovery &&
 # s.enterRACKRecovery(). pin-3 is an experiment. pin-4 and master-tsecr-fix,
 # and pin-5 and master-tlp-new-data, are the two fixes proposed here, not
-# upstream code.
+# upstream code; master-tsecr-fix-revised and master-tlp-new-data-revised are
+# their versions after review on google/gvisor#16659 and #16660 (2026-10-30).
 #
 # Usage: ./build-variants.sh [path to a gVisor "go" branch checkout at a6f909f08a72]
 # Without an argument, the pinned module is copied out of the Go module cache.
@@ -97,6 +102,13 @@ variant master-pr15432-16081-tlpnew "$master_src" patches/master-pr-15432-16081-
   patches/master-tlp-new-data-code.patch
 variant master-pr15432-16081-tsecr-tlpnew "$master_src" patches/master-pr-15432-16081-code.patch \
   patches/master-tsecr-fix-code.patch patches/master-tlp-new-data-code.patch
+variant master-tsecr2 "$master_src" patches/master-tsecr-fix-revised-code.patch
+variant master-pr15432-16081-tsecr2 "$master_src" patches/master-pr-15432-16081-code.patch \
+  patches/master-tsecr-fix-revised-code.patch
+variant master-pr15432-16081-tlpnew2 "$master_src" patches/master-pr-15432-16081-code.patch \
+  patches/master-tlp-new-data-revised-code.patch
+variant master-pr15432-16081-tsecr2-tlpnew2 "$master_src" patches/master-pr-15432-16081-code.patch \
+  patches/master-tsecr-fix-revised-code.patch patches/master-tlp-new-data-revised-code.patch
 variant master-pr16495 "$master_src" patches/master-pr-16495-code.patch
 variant master-pr15432-16081-16495-16419 "$master_src" patches/master-pr-15432-16081-16495-16419-code.patch
 ls -l bin
