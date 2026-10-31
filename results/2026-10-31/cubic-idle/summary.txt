@@ -1,0 +1,58 @@
+bench-cubic: 18 runs, estimated 12 min 52 s, at most about 15 min if every pin RACK-on fetch stalls
+load before: load averages 3.09 3.29 3.12
+harness: e14785e on cubic-idle
+== 16:02:04 pin-rackoff-1s t1 (idle 1s, 1 trial(s)); load: 3.09 3.29 3.12
+   pin-rackoff-1s POST trial=1 idle=1s elapsed=0.299s pre_cwnd=75 pre_ssthresh=65 max_cwnd=152 peak_pkts_per_ms=76 queue_drops=28 retx=28 rtos=0 status=ok
+   pin-rackoff-1s pre-idle fetches without an RTO: 2
+== 16:02:16 master-rackoff-1s t1 (idle 1s, 1 trial(s)); load: 2.93 3.25 3.10
+   master-rackoff-1s POST trial=1 idle=1s elapsed=0.300s pre_cwnd=54 pre_ssthresh=39 max_cwnd=68 peak_pkts_per_ms=18 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackoff-1s pre-idle fetches without an RTO: 3
+== 16:02:28 master-rackoff-1s t2 (idle 1s, 1 trial(s)); load: 3.38 3.33 3.14
+   master-rackoff-1s POST trial=1 idle=1s elapsed=0.299s pre_cwnd=53 pre_ssthresh=38 max_cwnd=69 peak_pkts_per_ms=16 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackoff-1s pre-idle fetches without an RTO: 3
+== 16:02:39 pin-rackoff-1s t2 (idle 1s, 1 trial(s)); load: 3.09 3.27 3.12
+   pin-rackoff-1s POST trial=1 idle=1s elapsed=0.299s pre_cwnd=74 pre_ssthresh=65 max_cwnd=153 peak_pkts_per_ms=98 queue_drops=28 retx=28 rtos=0 status=ok
+   pin-rackoff-1s pre-idle fetches without an RTO: 2
+== 16:02:51 master-rackoff-5s t1 (idle 5s, 1 trial(s)); load: 2.92 3.23 3.10
+   master-rackoff-5s POST trial=1 idle=5s elapsed=0.299s pre_cwnd=54 pre_ssthresh=39 max_cwnd=68 peak_pkts_per_ms=16 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackoff-5s pre-idle fetches without an RTO: 3
+== 16:03:06 pin-rackoff-5s t1 (idle 5s, 1 trial(s)); load: 3.25 3.29 3.12
+   pin-rackoff-5s POST trial=1 idle=5s elapsed=0.618s pre_cwnd=88 pre_ssthresh=80 max_cwnd=417 peak_pkts_per_ms=320 queue_drops=706 retx=859 rtos=2 status=ok
+   pin-rackoff-5s pre-idle fetches without an RTO: 2
+== 16:03:22 pin-rackoff-5s t2 (idle 5s, 1 trial(s)); load: 3.40 3.30 3.13
+   pin-rackoff-5s POST trial=1 idle=5s elapsed=0.621s pre_cwnd=101 pre_ssthresh=94 max_cwnd=401 peak_pkts_per_ms=196 queue_drops=726 retx=887 rtos=2 status=ok
+   pin-rackoff-5s pre-idle fetches without an RTO: 0
+== 16:03:38 master-rackoff-5s t2 (idle 5s, 1 trial(s)); load: 3.67 3.35 3.15
+   master-rackoff-5s POST trial=1 idle=5s elapsed=0.299s pre_cwnd=54 pre_ssthresh=39 max_cwnd=68 peak_pkts_per_ms=19 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackoff-5s pre-idle fetches without an RTO: 3
+== 16:03:53 pin-rackoff-30s t1 (idle 30s, 1 trial(s)); load: 3.25 3.27 3.13
+   pin-rackoff-30s POST trial=1 idle=30s elapsed=1.227s pre_cwnd=75 pre_ssthresh=66 max_cwnd=1249 peak_pkts_per_ms=196 queue_drops=1732 retx=2422 rtos=4 status=ok
+   pin-rackoff-30s pre-idle fetches without an RTO: 2
+== 16:04:35 master-rackoff-30s t1 (idle 30s, 1 trial(s)); load: 2.88 3.17 3.10
+   master-rackoff-30s POST trial=1 idle=30s elapsed=0.299s pre_cwnd=54 pre_ssthresh=39 max_cwnd=68 peak_pkts_per_ms=18 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackoff-30s pre-idle fetches without an RTO: 3
+== 16:05:15 master-rackoff-30s t2 (idle 30s, 1 trial(s)); load: 2.81 3.10 3.07
+   master-rackoff-30s POST trial=1 idle=30s elapsed=0.299s pre_cwnd=54 pre_ssthresh=39 max_cwnd=68 peak_pkts_per_ms=18 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackoff-30s pre-idle fetches without an RTO: 3
+== 16:05:55 pin-rackoff-30s t2 (idle 30s, 1 trial(s)); load: 2.93 3.12 3.08
+   pin-rackoff-30s POST trial=1 idle=30s elapsed=1.219s pre_cwnd=75 pre_ssthresh=66 max_cwnd=1242 peak_pkts_per_ms=274 queue_drops=1885 retx=2582 rtos=4 status=ok
+   pin-rackoff-30s pre-idle fetches without an RTO: 2
+== 16:06:37 master-rackoff-120s t1 (idle 120s, 1 trial(s)); load: 2.55 2.99 3.03
+   master-rackoff-120s POST trial=1 idle=2m0s elapsed=0.300s pre_cwnd=60 pre_ssthresh=47 max_cwnd=69 peak_pkts_per_ms=16 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackoff-120s pre-idle fetches without an RTO: 3
+== 16:08:47 pin-rackoff-120s t1 (idle 120s, 1 trial(s)); load: 2.48 2.83 2.96
+   pin-rackoff-120s POST trial=1 idle=2m0s elapsed=1.373s pre_cwnd=103 pre_ssthresh=96 max_cwnd=13983 peak_pkts_per_ms=1301 queue_drops=3755 retx=4557 rtos=4 status=ok
+   pin-rackoff-120s pre-idle fetches without an RTO: 0
+== 16:10:59 pin-rackon-5s t1 (idle 5s, 1 trial(s)); load: 1.91 2.49 2.80
+   pin-rackon-5s POST trial=1 idle=5s elapsed=30.000s pre_cwnd=33 pre_ssthresh=2 max_cwnd=707 peak_pkts_per_ms=354 queue_drops=1229 retx=944 rtos=144 status=error
+   pin-rackon-5s pre-idle fetches without an RTO: 2
+== 16:12:13 master-rackon-5s t1 (idle 5s, 1 trial(s)); load: 3.33 2.78 2.89
+   master-rackon-5s POST trial=1 idle=5s elapsed=0.299s pre_cwnd=53 pre_ssthresh=38 max_cwnd=69 peak_pkts_per_ms=14 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackon-5s pre-idle fetches without an RTO: 3
+== 16:12:29 master-rackon-30s t1 (idle 30s, 1 trial(s)); load: 3.11 2.76 2.88
+   master-rackon-30s POST trial=1 idle=30s elapsed=0.300s pre_cwnd=54 pre_ssthresh=39 max_cwnd=68 peak_pkts_per_ms=30 queue_drops=0 retx=0 rtos=0 status=ok
+   master-rackon-30s pre-idle fetches without an RTO: 3
+== 16:13:09 pin-rackon-30s t1 (idle 30s, 1 trial(s)); load: 2.88 2.76 2.87
+   pin-rackon-30s pre-idle fetches without an RTO: 0
+load after: load averages 2.70 2.79 2.88
+wall time: 748 s

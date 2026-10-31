@@ -1,0 +1,24 @@
+sender:   gVisor v0.0.0-20261031110703-16342efb9a78 (RACK off, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue 100 packets (drop-tail), MTU 1280
+loss:     in each measured fetch, deliver the first 1000 data packets, then drop up to 16 for at most 0s
+workload: 1 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 warm-up    0.299 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 16 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 77, last 77 (ssthresh 9223372036854775807 at first ACK, 36 at last)
+         sender: max phantom Outstanding (outside recovery) 4 pkts, cwnd min 10 max 77 last 77
+          (gVisor connection: TCP timestamps on)
+trial 1 fetch 2 warm-up    0.299 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 18 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 77, last 77 (ssthresh 36 at first ACK, 36 at last)
+         sender: max phantom Outstanding (outside recovery) 4 pkts, cwnd min 10 max 77 last 77
+trial 1 fetch 3 measured   0.299 s |  2409 data pkts,    16 retransmitted | RTOs   0
+         after 3s idle | peak 16 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 57, last 54 (ssthresh 36 at first ACK, 39 at last)
+         sender: max phantom Outstanding (outside recovery) 3 pkts, cwnd min 10 max 57 last 54
+         gVisor stats: retransmits 16, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+trial 1 fetch 4 post-idle   0.299 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 30s idle | peak 18 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 68, last 68 (ssthresh 39 at first ACK, 39 at last)
+         sender: max phantom Outstanding (outside recovery) 3 pkts, cwnd min 10 max 68 last 68
+
+measured fetches: 1, min 0.299 s, median 0.299 s, max 0.299 s, over 1 s: 0
+POST trial=1 idle=30s elapsed=0.299s pre_cwnd=54 pre_ssthresh=39 max_cwnd=68 peak_pkts_per_ms=18 queue_drops=0 retx=0 rtos=0 status=ok
+path drops toward the client: 0 by the queue, 16 scripted; reordered (held 200µs): 0

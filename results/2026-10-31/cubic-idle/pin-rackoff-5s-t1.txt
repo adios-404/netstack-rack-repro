@@ -1,0 +1,26 @@
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 (RACK off, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue 100 packets (drop-tail), MTU 1280
+loss:     in each measured fetch, deliver the first 1000 data packets, then drop up to 16 for at most 0s
+workload: 1 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 warm-up    0.662 s |  3441 data pkts,  1042 retransmitted | RTOs   2 (first at +0.25s) | retransmissions per RTO interval: median 650, max 650
+         after 3s idle | peak 200 data pkts in 1 ms | 898 queue drops | cwnd first 10, max 485, last 115 (ssthresh 9223372036854775807 at first ACK, 115 at last)
+         sender: max phantom Outstanding (outside recovery) 27 pkts, cwnd min 2 max 485 last 115
+         gVisor stats: retransmits 1042, timeouts 2, fast retransmits 2, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+trial 1 fetch 2 warm-up    0.299 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 20 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 115, last 115 (ssthresh 115 at first ACK, 115 at last)
+         sender: max phantom Outstanding (outside recovery) 6 pkts, cwnd min 10 max 115 last 115
+trial 1 fetch 3 measured   0.300 s |  2409 data pkts,    16 retransmitted | RTOs   0
+         after 3s idle | peak 30 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 115, last 88 (ssthresh 115 at first ACK, 80 at last)
+         sender: max phantom Outstanding (outside recovery) 6 pkts, cwnd min 10 max 115 last 88
+         gVisor stats: retransmits 16, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+trial 1 fetch 4 post-idle   0.618 s |  3252 data pkts,   859 retransmitted | RTOs   2 (first at +0.25s) | retransmissions per RTO interval: median 547, max 547
+         after 5s idle | peak 320 data pkts in 1 ms | 706 queue drops | cwnd first 10, max 417, last 99 (ssthresh 80 at first ACK, 99 at last)
+         sender: max phantom Outstanding (outside recovery) 19 pkts, cwnd min 2 max 417 last 99
+         gVisor stats: retransmits 859, timeouts 2, fast retransmits 2, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+
+measured fetches: 1, min 0.300 s, median 0.300 s, max 0.300 s, over 1 s: 0
+POST trial=1 idle=5s elapsed=0.618s pre_cwnd=88 pre_ssthresh=80 max_cwnd=417 peak_pkts_per_ms=320 queue_drops=706 retx=859 rtos=2 status=ok
+path drops toward the client: 1604 by the queue, 16 scripted; reordered (held 200µs): 0

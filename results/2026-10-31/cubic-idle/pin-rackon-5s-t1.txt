@@ -1,0 +1,27 @@
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue 100 packets (drop-tail), MTU 1280
+loss:     in each measured fetch, deliver the first 1000 data packets, then drop up to 16 for at most 0s
+workload: 1 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 warm-up    0.320 s |  5764 data pkts,  3365 retransmitted | RTOs   0
+         after 3s idle | peak 348 data pkts in 1 ms | 3294 queue drops | cwnd first 10, max 393, last 68 (ssthresh 9223372036854775807 at first ACK, 65 at last)
+         sender: max phantom Outstanding (outside recovery) 19 pkts, cwnd min 10 max 393 last 68
+         gVisor stats: retransmits 3365, timeouts 0, fast retransmits 5, SACK recoveries 5, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+trial 1 fetch 2 warm-up    0.307 s |  3849 data pkts,  1456 retransmitted | RTOs   0
+         after 3s idle | peak 184 data pkts in 1 ms | 1414 queue drops | cwnd first 10, max 263, last 44 (ssthresh 65 at first ACK, 43 at last)
+         sender: max phantom Outstanding (outside recovery) 12 pkts, cwnd min 10 max 263 last 44
+         gVisor stats: retransmits 1456, timeouts 0, fast retransmits 5, SACK recoveries 5, TLP recoveries 0, spurious RTO recoveries 0
+trial 1 fetch 3 measured  29.569 s |  3920 data pkts,  1527 retransmitted | RTOs 141 (first at +0.31s) | retransmissions per RTO interval: median 2, max 5
+         after 3s idle | peak 256 data pkts in 1 ms | 1508 queue drops | cwnd first 10, max 373, last 33 (ssthresh 43 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 17 pkts, cwnd min 2 max 373 last 33
+         gVisor stats: retransmits 1526, timeouts 141, fast retransmits 143, SACK recoveries 143, TLP recoveries 0, spurious RTO recoveries 0
+trial 1 fetch 4 post-idle  30.000 s |  1840 data pkts,   944 retransmitted | RTOs 144 (first at +0.24s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:35459->10.9.0.1:8080: i/o timeout
+         after 5s idle | peak 354 data pkts in 1 ms | 1229 queue drops | cwnd first 10, max 707, last 5 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 33 pkts, cwnd min 5 max 707 last 5
+         gVisor stats: retransmits 944, timeouts 144, fast retransmits 145, SACK recoveries 145, TLP recoveries 0, spurious RTO recoveries 0
+
+measured fetches: 1, min 29.569 s, median 29.569 s, max 29.569 s, over 1 s: 1
+POST trial=1 idle=5s elapsed=30.000s pre_cwnd=33 pre_ssthresh=2 max_cwnd=707 peak_pkts_per_ms=354 queue_drops=1229 retx=944 rtos=144 status=error
+path drops toward the client: 7445 by the queue, 16 scripted; reordered (held 200µs): 0
