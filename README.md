@@ -183,7 +183,10 @@ that include
 [tailscale/tailscale#22069](https://github.com/tailscale/tailscale/pull/22069).
 That PR merged the switch proposed in
 [tailscale/tailscale#22045](https://github.com/tailscale/tailscale/pull/22045)
-as `TS_NETSTACK_TCP_RACK`, the name the end-to-end runs below use. The
+as `TS_NETSTACK_TCP_RACK`, the name the end-to-end runs below use. Builds
+that also include
+[tailscale/tailscale#22092](https://github.com/tailscale/tailscale/pull/22092)
+turn RACK off by default, and `TS_NETSTACK_ENABLE_RACK=true` turns it on. The
 scenarios: `default` loses the tail and the loss probe;
 `tail-tlp-survives` loses the tail, and the probe and everything after it
 arrive; `tail-tlp-survives-no-ts` is the same with a client that does not
