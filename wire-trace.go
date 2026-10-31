@@ -35,6 +35,7 @@ type wireTrace struct {
 	retxTimes  []time.Duration    // Offsets from t0 of retransmitted packets.
 	dataPkts   int
 	retxPkts   int
+	perMs      map[int]int // Data packets sent per millisecond since t0.
 }
 
 type flowKey struct{ srcPort, dstPort uint16 }
@@ -53,6 +54,7 @@ func (w *wireTrace) reset(t0 time.Time) {
 	w.buckets = map[int]*traceBucket{}
 	w.retxTimes = nil
 	w.dataPkts, w.retxPkts = 0, 0
+	w.perMs = map[int]int{}
 }
 
 func (w *wireTrace) bucketLocked(now time.Time) *traceBucket {
@@ -86,6 +88,9 @@ func (w *wireTrace) recordSent(now time.Time, p *packetInfo) {
 	b.dataPkts++
 	b.dataBytes += p.payloadLen
 	w.dataPkts++
+	if w.perMs != nil {
+		w.perMs[int(now.Sub(w.t0)/time.Millisecond)]++
+	}
 	end := p.seq + uint32(p.payloadLen)
 	key := flowKey{p.srcPort, p.dstPort}
 	high, ok := w.highestEnd[key]
@@ -137,6 +142,19 @@ func (w *wireTrace) retransmitTimes() []time.Duration {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	return append([]time.Duration(nil), w.retxTimes...)
+}
+
+// peakPerMs returns the most data packets sent within one millisecond since
+// the last reset: a sender that releases a large window at once shows up
+// here, while an ACK-clocked one sends about 8 per ms at 80 Mbit/s.
+func (w *wireTrace) peakPerMs() int {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	peak := 0
+	for _, n := range w.perMs {
+		peak = max(peak, n)
+	}
+	return peak
 }
 
 func (w *wireTrace) counts() (data, retx int) {

@@ -60,6 +60,8 @@ var (
 	reorderPct   = flag.Float64("reorder-pct", 0, "percent of data packets toward the client held for -reorder-hold so later ones overtake them")
 	reorderHold  = flag.Duration("reorder-hold", 200*time.Microsecond, "extra delay of a reordered data packet")
 	traceFlag    = flag.Bool("trace", false, "print the per-100 ms wire trace (and gVisor sender state) for each measured fetch")
+	postFetches  = flag.Int("post-fetches", 0, "fetches per trial after the measured ones, without scripted loss, each after -post-interval idle")
+	postInterval = flag.Duration("post-interval", 30*time.Second, "idle time before each post-idle fetch")
 )
 
 const serverPort = 8080
@@ -73,6 +75,10 @@ type fetchResult struct {
 	trial     int
 	n         int
 	measured  bool
+	post      bool // A post-idle fetch: after the measured ones, without scripted loss.
+	idle      time.Duration
+	queueDrop int // Packets toward the client dropped by the bottleneck queue during this fetch.
+	peakPerMs int // Most data packets the server sent within one millisecond.
 	elapsed   time.Duration
 	err       error
 	dataPkts  int
@@ -228,11 +234,17 @@ func main() {
 				fmt.Printf("          (kernel connection congestion control: %s, TCP timestamps %s)\n", congestionControlOf(kconn), timestampsOf(kconn))
 			}
 		}
-		for n := 1; n <= *warmupFlag+*fetchesFlag; n++ {
-			time.Sleep(*intervalFlag)
-			measured := n > *warmupFlag
+		for n := 1; n <= *warmupFlag+*fetchesFlag+*postFetches; n++ {
+			post := n > *warmupFlag+*fetchesFlag
+			idle := *intervalFlag
+			if post {
+				idle = *postInterval
+			}
+			time.Sleep(idle)
+			measured := n > *warmupFlag && !post
 			armed.Store(measured && *lossFlag == "burst")
-			r := fetchResult{trial: trial, n: n, measured: measured}
+			r := fetchResult{trial: trial, n: n, measured: measured, post: post, idle: idle}
+			queueBefore, _ := s2c.drops()
 			t0 := time.Now()
 			trace.reset(t0)
 			var tw *timeoutWatcher
@@ -265,6 +277,9 @@ func main() {
 				r.rtoTimes = kw.stop()
 			}
 			r.dataPkts, r.retxPkts = trace.counts()
+			r.peakPerMs = trace.peakPerMs()
+			queueAfter, _ := s2c.drops()
+			r.queueDrop = queueAfter - queueBefore
 			r.retxTimes = trace.retransmitTimes()
 			printFetch(r)
 			if rec != nil && trial == 1 && n == 1 {
@@ -272,7 +287,7 @@ func main() {
 					fmt.Printf("          (gVisor connection: TCP timestamps %s)\n", onOff(on))
 				}
 			}
-			if *traceFlag && measured {
+			if *traceFlag && (measured || post) {
 				fmt.Printf("  wire trace at the server (data sent before loss; ACKs received):\n")
 				trace.print(os.Stdout, 40)
 				if len(r.samples) > 0 {
@@ -289,6 +304,7 @@ func main() {
 		conn.Close()
 	}
 	printSummary(results)
+	printPostSummary(results)
 	q, s := s2c.drops()
 	fmt.Printf("path drops toward the client: %d by the queue, %d scripted; reordered (held %v): %d\n", q, s, *reorderHold, s2c.reorderCount())
 }
@@ -315,8 +331,11 @@ func serve(c net.Conn, payload []byte) {
 
 func printFetch(r fetchResult) {
 	kind := "warm-up "
-	if r.measured {
+	switch {
+	case r.measured:
 		kind = "measured"
+	case r.post:
+		kind = "post-idle"
 	}
 	status := ""
 	if r.err != nil {
@@ -327,6 +346,7 @@ func printFetch(r fetchResult) {
 	}
 	fmt.Printf("trial %d fetch %d %s %7.3f s | %5d data pkts, %5d retransmitted | RTOs %3d%s%s\n",
 		r.trial, r.n, kind, r.elapsed.Seconds(), r.dataPkts, r.retxPkts, len(r.rtoTimes), perRTO(r), status)
+	fmt.Printf("         after %v idle | peak %d data pkts in 1 ms | %d queue drops%s\n", r.idle, r.peakPerMs, r.queueDrop, cwndDesc(r.samples))
 	if len(r.samples) > 0 {
 		mss := *mtuFlag - 40 - 12
 		maxPhantom, minCwnd, maxCwnd, lastCwnd := 0, 1<<30, 0, 0
@@ -437,4 +457,45 @@ func everyDesc(n int) string {
 		return ""
 	}
 	return fmt.Sprintf(" (delivering one in every %d)", n)
+}
+
+// cwndDesc summarizes the gVisor sender's congestion window during one fetch:
+// at the first ACK, the largest, and at the last ACK.
+func cwndDesc(samples []senderSample) string {
+	if len(samples) == 0 {
+		return ""
+	}
+	first, last := samples[0], samples[len(samples)-1]
+	maxCwnd := 0
+	for _, s := range samples {
+		maxCwnd = max(maxCwnd, s.cwnd)
+	}
+	return fmt.Sprintf(" | cwnd first %d, max %d, last %d (ssthresh %d at first ACK, %d at last)",
+		first.cwnd, maxCwnd, last.cwnd, first.ssthresh, last.ssthresh)
+}
+
+// printPostSummary prints one line per post-idle fetch, for grepping.
+func printPostSummary(results []fetchResult) {
+	for i, r := range results {
+		if !r.post {
+			continue
+		}
+		// The window and ssthresh the sender had when the previous fetch
+		// ended, before the idle period.
+		preCwnd, preSsthresh := -1, -1
+		if i > 0 && len(results[i-1].samples) > 0 {
+			last := results[i-1].samples[len(results[i-1].samples)-1]
+			preCwnd, preSsthresh = last.cwnd, last.ssthresh
+		}
+		maxCwnd := -1
+		for _, s := range r.samples {
+			maxCwnd = max(maxCwnd, s.cwnd)
+		}
+		status := "ok"
+		if r.err != nil {
+			status = "error"
+		}
+		fmt.Printf("POST trial=%d idle=%v elapsed=%.3fs pre_cwnd=%d pre_ssthresh=%d max_cwnd=%d peak_pkts_per_ms=%d queue_drops=%d retx=%d rtos=%d status=%s\n",
+			r.trial, r.idle, r.elapsed.Seconds(), preCwnd, preSsthresh, maxCwnd, r.peakPerMs, r.queueDrop, r.retxPkts, len(r.rtoTimes), status)
+	}
 }
