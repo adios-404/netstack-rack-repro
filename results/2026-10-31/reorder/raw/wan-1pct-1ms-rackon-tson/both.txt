@@ -1,0 +1,56 @@
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 30ms + up to 2x200µs jitter (seed 1), 200 Mbit/s toward the client, queue unlimited, MTU 1280
+reorder:  1% of data packets toward the client held 1ms (seed 8)
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 20000000 bytes, 100ms idle before each
+
+trial 1 fetch 1 measured   3.011 s | 17091 data pkts,     1 retransmitted | RTOs   0
+         sender: max phantom Outstanding (outside recovery) 11 pkts, cwnd min 10 max 227 last 227
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 3.011 s, median 3.011 s, max 3.011 s, over 1 s: 1
+path drops toward the client: 0 by the queue, 0 scripted; reordered (held 1ms): 150
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 30ms + up to 2x200µs jitter (seed 2), 200 Mbit/s toward the client, queue unlimited, MTU 1280
+reorder:  1% of data packets toward the client held 1ms (seed 9)
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 20000000 bytes, 100ms idle before each
+
+trial 1 fetch 1 measured   2.576 s | 17091 data pkts,     1 retransmitted | RTOs   0
+         sender: max phantom Outstanding (outside recovery) 11 pkts, cwnd min 10 max 252 last 252
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 2.576 s, median 2.576 s, max 2.576 s, over 1 s: 1
+path drops toward the client: 0 by the queue, 0 scripted; reordered (held 1ms): 173
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 30ms + up to 2x200µs jitter (seed 3), 200 Mbit/s toward the client, queue unlimited, MTU 1280
+reorder:  1% of data packets toward the client held 1ms (seed 10)
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 20000000 bytes, 100ms idle before each
+
+trial 1 fetch 1 measured   3.811 s | 17095 data pkts,     5 retransmitted | RTOs   0
+         sender: max phantom Outstanding (outside recovery) 9 pkts, cwnd min 10 max 200 last 200
+         gVisor stats: retransmits 5, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 3.811 s, median 3.811 s, max 3.811 s, over 1 s: 1
+path drops toward the client: 0 by the queue, 0 scripted; reordered (held 1ms): 176
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 30ms + up to 2x200µs jitter (seed 4), 200 Mbit/s toward the client, queue unlimited, MTU 1280
+reorder:  1% of data packets toward the client held 1ms (seed 11)
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 20000000 bytes, 100ms idle before each
+
+trial 1 fetch 1 measured   2.937 s | 17091 data pkts,     1 retransmitted | RTOs   0
+         sender: max phantom Outstanding (outside recovery) 11 pkts, cwnd min 10 max 231 last 231
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 2.937 s, median 2.937 s, max 2.937 s, over 1 s: 1
+path drops toward the client: 0 by the queue, 0 scripted; reordered (held 1ms): 161

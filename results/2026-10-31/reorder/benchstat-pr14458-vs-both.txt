@@ -1,0 +1,83 @@
+goos: darwin
+pkg: netstack-rack-repro
+                                       │     pr14458     │                  both                  │
+                                       │     sec/op      │     sec/op      vs base                │
+Reorder/lan-1pct-200us/rack=off/ts=off     1.318 ±  4%      1.283 ±  6%          ~ (p=0.274 n=16)
+Reorder/lan-1pct-200us/rack=off/ts=on     258.0m ±  2%     254.0m ±  2%          ~ (p=0.406 n=16)
+Reorder/lan-1pct-200us/rack=on/ts=off    1154.0m ±  4%     934.5m ±  5%    -19.02% (p=0.000 n=16)
+Reorder/lan-1pct-200us/rack=on/ts=on      195.0m ±  4%     185.5m ±  4%     -4.87% (p=0.003 n=16)
+Reorder/lan-25pct-15us/rack=off/ts=off     2.850 ±  5%      1.913 ±  2%    -32.89% (p=0.000 n=16)
+Reorder/lan-25pct-15us/rack=off/ts=on     575.0m ±  2%     560.0m ±  1%     -2.61% (p=0.000 n=16)
+Reorder/lan-25pct-15us/rack=on/ts=off    2348.0m ±  7%     314.0m ± 14%    -86.63% (p=0.000 n=16)
+Reorder/lan-25pct-15us/rack=on/ts=on      770.0m ± 21%     169.0m ±  0%    -78.05% (p=0.000 n=16)
+Reorder/lan-noreorder/rack=off/ts=on      168.0m ±  1%     169.0m ±  1%          ~ (p=0.724 n=16)
+Reorder/lan-noreorder/rack=on/ts=on       169.0m ±  1%     168.5m ±  0%          ~ (p=0.473 n=16)
+Reorder/wan-1pct-1ms/rack=off/ts=on        4.426 ±   ∞ ¹    4.427 ±   ∞ ¹        ~ (p=1.000 n=4)
+Reorder/wan-1pct-1ms/rack=on/ts=on        11.765 ±   ∞ ¹    2.974 ±   ∞ ¹  -74.72% (p=0.029 n=4)
+Reorder/wan-noreorder/rack=off/ts=on                        1.017 ±   ∞ ¹
+Reorder/wan-noreorder/rack=on/ts=on                         1.017 ±   ∞ ¹
+geomean                                   912.9m           620.2m          -37.44%
+¹ need >= 6 samples for confidence interval at level 0.95
+
+                                       │    pr14458     │                  both                   │
+                                       │    retx/op     │    retx/op     vs base                  │
+Reorder/lan-1pct-200us/rack=off/ts=off    95.50 ±  8%     99.50 ±  9%          ~ (p=0.570 n=16)
+Reorder/lan-1pct-200us/rack=off/ts=on     156.0 ±  6%     155.5 ±  5%          ~ (p=0.874 n=16)
+Reorder/lan-1pct-200us/rack=on/ts=off     52.50 ±  9%     51.50 ±  7%          ~ (p=0.730 n=16)
+Reorder/lan-1pct-200us/rack=on/ts=on      59.50 ± 13%     54.50 ± 10%          ~ (p=0.095 n=16)
+Reorder/lan-25pct-15us/rack=off/ts=off    165.5 ±  7%     212.5 ±  2%    +28.40% (p=0.000 n=16)
+Reorder/lan-25pct-15us/rack=off/ts=on     767.0 ±  3%     780.5 ±  4%          ~ (p=0.068 n=16)
+Reorder/lan-25pct-15us/rack=on/ts=off    11.000 ± 18%     6.000 ± 33%    -45.45% (p=0.000 n=16)
+Reorder/lan-25pct-15us/rack=on/ts=on     15.000 ± 33%     4.000 ± 75%    -73.33% (p=0.000 n=16)
+Reorder/lan-noreorder/rack=off/ts=on      0.000 ±  0%     0.000 ±  0%          ~ (p=1.000 n=16) ¹
+Reorder/lan-noreorder/rack=on/ts=on       0.000 ±  0%     0.000 ±  0%          ~ (p=1.000 n=16) ¹
+Reorder/wan-1pct-1ms/rack=off/ts=on       140.5 ±   ∞ ²   139.5 ±   ∞ ²        ~ (p=0.857 n=4)
+Reorder/wan-1pct-1ms/rack=on/ts=on        1.000 ±   ∞ ²   1.000 ±   ∞ ²        ~ (p=1.000 n=4)
+Reorder/wan-noreorder/rack=off/ts=on                      0.000 ±   ∞ ²
+Reorder/wan-noreorder/rack=on/ts=on                       0.000 ±   ∞ ²
+geomean                                               ³                  -13.47%                ³
+¹ all samples are equal
+² need >= 6 samples for confidence interval at level 0.95
+³ summaries must be >0 to compute geomean
+
+                                       │   pr14458    │                 both                  │
+                                       │   rtos/op    │   rtos/op     vs base                 │
+Reorder/lan-1pct-200us/rack=off/ts=off   0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=off/ts=on    0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=on/ts=off    0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=on/ts=on     0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=off/ts=off   0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=off/ts=on    0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=on/ts=off    0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=on/ts=on     0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-noreorder/rack=off/ts=on     0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-noreorder/rack=on/ts=on      0.000 ± 0%     0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/wan-1pct-1ms/rack=off/ts=on      0.000 ±  ∞ ²   0.000 ±  ∞ ²       ~ (p=1.000 n=4)  ¹
+Reorder/wan-1pct-1ms/rack=on/ts=on       0.000 ±  ∞ ²   0.000 ±  ∞ ²       ~ (p=1.000 n=4)  ¹
+Reorder/wan-noreorder/rack=off/ts=on                    0.000 ±  ∞ ²
+Reorder/wan-noreorder/rack=on/ts=on                     0.000 ±  ∞ ²
+geomean                                             ³                 +0.00%                ³
+¹ all samples are equal
+² need >= 6 samples for confidence interval at level 0.95
+³ summaries must be >0 to compute geomean
+
+                                       │     pr14458     │                   both                   │
+                                       │ spurious-rto/op │ spurious-rto/op  vs base                 │
+Reorder/lan-1pct-200us/rack=off/ts=off      0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=off/ts=on       0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=on/ts=off       0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=on/ts=on        0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=off/ts=off      0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=off/ts=on       0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=on/ts=off       0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-25pct-15us/rack=on/ts=on        0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-noreorder/rack=off/ts=on        0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/lan-noreorder/rack=on/ts=on         0.000 ± 0%        0.000 ± 0%         ~ (p=1.000 n=16) ¹
+Reorder/wan-1pct-1ms/rack=off/ts=on         0.000 ±  ∞ ²      0.000 ±  ∞ ²       ~ (p=1.000 n=4)  ¹
+Reorder/wan-1pct-1ms/rack=on/ts=on          0.000 ±  ∞ ²      0.000 ±  ∞ ²       ~ (p=1.000 n=4)  ¹
+Reorder/wan-noreorder/rack=off/ts=on                          0.000 ±  ∞ ²
+Reorder/wan-noreorder/rack=on/ts=on                           0.000 ±  ∞ ²
+geomean                                                ³                    +0.00%                ³
+¹ all samples are equal
+² need >= 6 samples for confidence interval at level 0.95
+³ summaries must be >0 to compute geomean
