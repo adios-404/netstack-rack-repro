@@ -57,6 +57,8 @@ var (
 	timeoutFlag  = flag.Duration("timeout", 120*time.Second, "per-fetch timeout")
 	linuxCCFlag  = flag.String("linux-cc", "cubic", "Linux sender: congestion control (Ubuntu's default is cubic)")
 	clientTSFlag = flag.Bool("client-timestamps", true, "client: offer TCP timestamps (false: strip them from its SYN, like Windows' default settings)")
+	reorderPct   = flag.Float64("reorder-pct", 0, "percent of data packets toward the client held for -reorder-hold so later ones overtake them")
+	reorderHold  = flag.Duration("reorder-hold", 200*time.Microsecond, "extra delay of a reordered data packet")
 	traceFlag    = flag.Bool("trace", false, "print the per-100 ms wire trace (and gVisor sender state) for each measured fetch")
 )
 
@@ -101,6 +103,9 @@ func main() {
 	s2c := newPathDirection("server->client", *rttFlag/2, *jitterFlag, *seedFlag, *rateFlag*1e6, *queueFlag, client.inject, trace)
 	if *lossFlag == "burst" {
 		s2c.dropper = dropper.drop
+	}
+	if *reorderPct > 0 {
+		s2c.setReorder(*reorderPct, *reorderHold, *seedFlag+7)
 	}
 
 	var (
@@ -197,6 +202,9 @@ func main() {
 	fmt.Printf("client:   gVisor, TCP timestamps %s\n", clientTS)
 	fmt.Printf("path:     RTT %v + up to 2x%v jitter (seed %d), %g Mbit/s toward the client, queue %s, MTU %d\n",
 		*rttFlag, *jitterFlag, *seedFlag, *rateFlag, queueDesc(*queueFlag), *mtuFlag)
+	if *reorderPct > 0 {
+		fmt.Printf("reorder:  %g%% of data packets toward the client held %v (seed %d)\n", *reorderPct, *reorderHold, *seedFlag+7)
+	}
 	if *lossFlag == "burst" {
 		fmt.Printf("loss:     in each measured fetch, deliver the first %d data packets, then drop up to %d%s for at most %v%s\n",
 			*burstKeep, *burstDrop, everyDesc(*burstEvery), *burstWindow, gapDesc(*burstGap))
@@ -282,7 +290,7 @@ func main() {
 	}
 	printSummary(results)
 	q, s := s2c.drops()
-	fmt.Printf("path drops toward the client: %d by the queue, %d scripted\n", q, s)
+	fmt.Printf("path drops toward the client: %d by the queue, %d scripted; reordered (held %v): %d\n", q, s, *reorderHold, s2c.reorderCount())
 }
 
 // serve answers each 8-byte request with that many bytes, written in 32 KiB
@@ -319,6 +327,20 @@ func printFetch(r fetchResult) {
 	}
 	fmt.Printf("trial %d fetch %d %s %7.3f s | %5d data pkts, %5d retransmitted | RTOs %3d%s%s\n",
 		r.trial, r.n, kind, r.elapsed.Seconds(), r.dataPkts, r.retxPkts, len(r.rtoTimes), perRTO(r), status)
+	if len(r.samples) > 0 {
+		mss := *mtuFlag - 40 - 12
+		maxPhantom, minCwnd, maxCwnd, lastCwnd := 0, 1<<30, 0, 0
+		for _, s := range r.samples {
+			inflight := (int(s.unacked) + mss - 1) / mss
+			if !s.inRecovery && s.outstanding-inflight > maxPhantom {
+				maxPhantom = s.outstanding - inflight
+			}
+			minCwnd = min(minCwnd, s.cwnd)
+			maxCwnd = max(maxCwnd, s.cwnd)
+			lastCwnd = s.cwnd
+		}
+		fmt.Printf("         sender: max phantom Outstanding (outside recovery) %d pkts, cwnd min %d max %d last %d\n", maxPhantom, minCwnd, maxCwnd, lastCwnd)
+	}
 	if r.stats != (statCounters{}) {
 		fmt.Printf("         gVisor stats: retransmits %d, timeouts %d, fast retransmits %d, SACK recoveries %d, TLP recoveries %d, spurious RTO recoveries %d\n",
 			r.stats.retransmits, r.stats.timeouts, r.stats.fastRetransmit, r.stats.sackRecovery, r.stats.tlpRecovery, r.stats.spuriousRTO)

@@ -149,6 +149,64 @@ The two proposed changes:
 suites run under `go test`, without Bazel: the `go` branch export of a
 master commit, plus that commit's test files.
 
+## Reordering
+
+`-reorder-pct P` holds P percent of the TCP data packets toward the client
+for `-reorder-hold` (default 200 µs) past their delivery time, so the
+packets behind them overtake them, much as netem's `delay ... reorder`
+does. A held packet still leaves the bottleneck in its turn, so the rate
+and the queue are unchanged; only its arrival is late. ACKs and segments
+without data are never held, and nothing is dropped unless a loss scenario
+is set as well (`-loss none` turns the scripted burst off). The mode works
+with either sender, so Linux kernel TCP can run the same path.
+
+The held packets are picked by a generator seeded with `-seed` + 7, so the
+same seed gives the same sequence of hold decisions. Which packets they fall
+on still depends on what the sender sends, so two senders with the same
+seed see the same reordering rate but not the same packets. Holds well under
+2 ms are exact; beyond that, the emulator can sleep past a packet that
+overtook a held one and deliver it late.
+
+The output gains three lines: `reorder:` in the header, the number of held
+packets after `path drops toward the client:`, and for each gVisor fetch a
+`sender:` line with the largest excess of `Outstanding` over the
+unacknowledged bytes divided by the MSS, while not in loss recovery
+([#14092](https://github.com/google/gvisor/issues/14092)), and the smallest,
+largest and last congestion window, from gVisor's TCP probe. The excess is
+a rough estimate: partial segments make it read 9 to 15 packets even
+without reordering.
+
+```sh
+# Tailscale's netstack settings (CUBIC, SACK, host GSO), RACK off (its
+# default since tailscale/tailscale#22092), on a 1 ms, 1 Gbit/s
+# path with 1% of data packets held 200 µs: one warm-up and one measured
+# 20 MB fetch on a new connection.
+bin/repro-pin -rack=false -loss none -rtt 1ms -rate-mbps 1000 \
+  -size 20000000 -warmup 1 -fetches 1 -trials 1 -interval 100ms \
+  -reorder-pct 1 -reorder-hold 200us -seed 1
+# Many shallow reorderings, closer to a NIC that spreads one flow over its
+# transmit queues: -reorder-pct 25 -reorder-hold 15us
+# A client that does not offer timestamps: -client-timestamps=false
+# A 30 ms, 200 Mbit/s path: -rtt 30ms -rate-mbps 200 -reorder-hold 1ms
+```
+
+Give each run two idle CPUs, as above; at 1 Gbit/s the emulator is busy
+for the whole fetch. Use one trial per process and a different `-seed` for
+each, and interleave the builds being compared, as
+`run-paired-benchmarks.sh` does. To build against another gVisor tree, add
+`replace gvisor.dev/gvisor => <tree>` to a copy of `go.mod` and build with
+`-modfile`, as `build-variants.sh` does.
+
+The gVisor changes this mode is meant to exercise are
+[#14101](https://github.com/google/gvisor/pull/14101), which stops packets
+SACKed outside loss recovery from staying in `Outstanding`
+([#14092](https://github.com/google/gvisor/issues/14092)), and
+[#14458](https://github.com/google/gvisor/pull/14458), which undoes the
+congestion window reduction of a recovery found to be spurious (RFC 4015;
+[#14102](https://github.com/google/gvisor/issues/14102)). Reordering's cost
+to Tailscale's netstack is measured on real hardware in
+[tailscale/tailscale#21651](https://github.com/tailscale/tailscale/issues/21651).
+
 ## Results (2026-10-27 to 2026-10-30)
 
 Eight trials per cell, each on a new connection, unless noted. Each cell
@@ -496,8 +554,8 @@ acknowledged segments, which both versions treat alike.
 ## Limits
 
 - The loss is scripted and the path is simple: no Wi-Fi aggregation, no
-  reordering, no ACK loss. It shows the recovery behavior, not how often a
-  real network produces such a burst.
+  ACK loss, and no reordering beyond the seeded mode above. It shows the
+  recovery behavior, not how often a real network produces such a burst.
 - Trials are not identical. The drop rule is fixed, but timing, and with it
   the window at the burst and the size of the loss, varies from trial to
   trial. Eight trials are too few to compare variants whose results differ

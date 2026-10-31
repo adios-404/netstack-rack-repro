@@ -3,6 +3,8 @@ package main
 import (
 	"math/rand/v2"
 	"runtime"
+	"slices"
+	"sort"
 	"sync"
 	"time"
 )
@@ -36,6 +38,15 @@ type pathDirection struct {
 
 	queueDrops  int
 	scriptDrops int
+
+	// Reordering (-reorder-pct, -reorder-hold): reorderPct percent of TCP
+	// data packets are held for reorderHold past their delivery time, so
+	// later packets overtake them, much like netem's "delay ... reorder".
+	// rrng picks the held packets; reordered counts them.
+	reorderPct  float64
+	reorderHold time.Duration
+	rrng        *rand.Rand
+	reordered   int
 }
 
 type scheduledPacket struct {
@@ -113,14 +124,25 @@ func (d *pathDirection) send(b []byte) {
 	if deliverAt.Before(d.lastDeliver) {
 		deliverAt = d.lastDeliver
 	}
-	d.lastDeliver = deliverAt
-	d.inFlight = append(d.inFlight, scheduledPacket{b: b, deliverAt: deliverAt})
+	// Why: a held packet does not move lastDeliver, so the packets behind it
+	// keep their own delivery times and overtake it. Holds well under
+	// spinWindow are exact: deliverLoop then spins instead of sleeping past a
+	// packet that was queued ahead of the held one.
+	held := d.reorderPct > 0 && info.isTCP && info.payloadLen > 0 && d.rrng.Float64()*100 < d.reorderPct
+	if held {
+		deliverAt = deliverAt.Add(d.reorderHold)
+		d.reordered++
+	} else {
+		d.lastDeliver = deliverAt
+	}
+	i := sort.Search(len(d.inFlight), func(i int) bool { return d.inFlight[i].deliverAt.After(deliverAt) })
+	d.inFlight = slices.Insert(d.inFlight, i, scheduledPacket{b: b, deliverAt: deliverAt})
 	d.cond.Signal()
 }
 
-// deliverLoop hands packets to the receiver in FIFO order once their delivery
-// time has passed. FIFO order is also time order because the queue is FIFO and
-// the propagation delay is constant.
+// deliverLoop hands packets to the receiver once their delivery time has
+// passed. send keeps inFlight sorted by delivery time, which is FIFO order
+// unless reordering holds a packet back.
 func (d *pathDirection) deliverLoop() {
 	var batch [][]byte
 	for {
@@ -169,6 +191,21 @@ func (d *pathDirection) close() {
 	d.closed = true
 	d.cond.Broadcast()
 	d.mu.Unlock()
+}
+
+// setReorder holds pct percent of the TCP data packets for hold, picked by a
+// generator seeded with seed.
+func (d *pathDirection) setReorder(pct float64, hold time.Duration, seed uint64) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.reorderPct, d.reorderHold = pct, hold
+	d.rrng = rand.New(rand.NewPCG(seed, seed^0x9e3779b97f4a7c15))
+}
+
+func (d *pathDirection) reorderCount() int {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return d.reordered
 }
 
 func (d *pathDirection) drops() (queue, script int) {
