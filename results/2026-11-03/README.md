@@ -129,6 +129,22 @@ the recovery took 6.4 s, or 44.8 s once, against 2.5–2.7 s for the others.
 The change costs about 9% with a 16-packet buffer, and nothing measurable
 with random loss.
 
+`wireguard-go-patch/` runs a fourth build, `bin/e2e-newt-wgpatch`: newt
+`76ff3b1` with only `patches/wireguard-go-disable-rack.patch` applied to the
+wireguard-go it pins, so the main tunnel runs wireguard-go's own netstack
+with RACK off. Its `site up` lines read like the first build's, because only
+wireguard-go differs; the file names tell them apart. Run later the same day
+on the same virtual machine, with one more pass of the first build on the
+idle link:
+
+| 30 ms RTT, Linux receiver | first build, same day (RACK on) | wireguard-go patched (RACK off) |
+|---|---|---|
+| 2.8 MB, 100 Mbit/s, everything in flight lost once (`burst`) | see the table above | 0.94–0.99 s |
+| 20 MB, 50 Mbit/s uplink, 256-packet buffer | see the table above | 4.25–4.27 s |
+| 20 MB, 50 Mbit/s uplink, 16-packet buffer | see the table above | 36.6–39.1 s |
+| 20 MB, 100 Mbit/s, 0.5% random loss each way | see the table above | 18.2–31.2 s |
+| 20 MB, 100 Mbit/s uplink, 1000-packet buffer, no other loss | 4.1, 48.1, 6.6 s | 2.6–2.7 s |
+
 `first-pass/` is an earlier run of the first two builds with netem's delay
 on the uplink. netem counts the packets it is delaying against its limit,
 so its 64-packet "buffer" left almost no room and acted like a policer;

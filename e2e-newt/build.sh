@@ -11,6 +11,10 @@
 #                         google/gvisor#15432, #16081, #16659 and #16660
 #                         (../patches/wgpin-*), as newt would run once gVisor has
 #                         them
+#   bin/e2e-newt-wgpatch  <before rev> with its wireguard-go patched with
+#                         ../patches/wireguard-go-disable-rack.patch (RACK off
+#                         in wireguard-go's tun/netstack, which the main tunnel
+#                         runs on)
 # Usage: ./build.sh <newt clone> <before rev> <after rev> [GOARCH, default arm64]
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -23,12 +27,12 @@ work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 mkdir -p bin
 build() {
-  local name="$1" rev="$2" tags="$3" gvisor="${4:-}"
+  local name="$1" rev="$2" tags="$3" replace="${4:-}"
   mkdir -p "$work/$name/cmd/e2e-newt"
   git -C "$repo" archive "$rev" | tar -x -C "$work/$name"
   cp ./*.go "$work/$name/cmd/e2e-newt/"
-  if [[ -n "$gvisor" ]]; then
-    (cd "$work/$name" && go mod edit -replace "gvisor.dev/gvisor=$gvisor")
+  if [[ -n "$replace" ]]; then
+    (cd "$work/$name" && go mod edit -replace "$replace")
   fi
   (cd "$work/$name" && GOOS=linux GOARCH="$arch" go build -mod=mod -tags "$tags" -o "$OLDPWD/bin/e2e-newt-$name" ./cmd/e2e-newt)
   echo "$name: newt $(git -C "$repo" rev-parse --short "$rev^{commit}")"
@@ -42,4 +46,11 @@ chmod -R u+w "$work/gvisor-fixed"
 for p in ../patches/wgpin-1-* ../patches/wgpin-2-* ../patches/wgpin-3-* ../patches/wgpin-4-*; do
   patch -s -f -d "$work/gvisor-fixed" -p1 < "$p"
 done
-build gvfix "$before" "" "$work/gvisor-fixed"
+build gvfix "$before" "" "gvisor.dev/gvisor=$work/gvisor-fixed"
+# Why: the version newt pins, so that only the patch differs.
+wg=v0.0.0-20250521234502-f333402bd9cb
+go mod download golang.zx2c4.com/wireguard@"$wg"
+cp -r "$(go env GOMODCACHE)/golang.zx2c4.com/wireguard@$wg" "$work/wireguard-patched"
+chmod -R u+w "$work/wireguard-patched"
+patch -s -f -d "$work/wireguard-patched" -p1 < ../patches/wireguard-go-disable-rack.patch
+build wgpatch "$before" "" "golang.zx2c4.com/wireguard=$work/wireguard-patched"
