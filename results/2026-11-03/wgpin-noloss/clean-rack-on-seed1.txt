@@ -1,0 +1,14 @@
+sender:   gVisor v0.0.0-20250503011706-39ed1f5ac29c set up like wireguard-go's tun/netstack (RACK on, reno, no GSO)
+client:   gVisor, TCP timestamps on
+path:     RTT 30ms + up to 2x200µs jitter (seed 1), 100 Mbit/s toward the client, queue unlimited, MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 20000000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   4.249 s | 17263 data pkts,   411 retransmitted | RTOs   1 (first at +1.73s) | retransmissions per RTO interval: median 238, max 238
+         after 3s idle | peak 1078 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 9312, last 183 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 168 pkts, cwnd min 3 max 9312 last 183
+         gVisor stats: retransmits 411, timeouts 1, fast retransmits 2, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 4.249 s, median 4.249 s, max 4.249 s, over 1 s: 1
+path drops toward the client: 0 by the queue, 0 scripted; reordered (held 200µs): 0

@@ -1,0 +1,12 @@
+11:57:28.838913 site up: newt netstack2 (proposed change), proxy on 10.77.0.2:8080, scripted loss: none
+path: 30 ms RTT, uplink 100mbit, queue 1000 packets, loss 0.5%; 5 fetches of 20000000 bytes
+fetch 1:  28.879 s, 20000000 of 20000000 bytes,    5.5 Mbit/s
+fetch 2:  27.919 s, 20000000 of 20000000 bytes,    5.7 Mbit/s
+fetch 3:  28.027 s, 20000000 of 20000000 bytes,    5.7 Mbit/s
+fetch 4:  26.025 s, 20000000 of 20000000 bytes,    6.1 Mbit/s
+fetch 5:  28.096 s, 20000000 of 20000000 bytes,    5.7 Mbit/s
+site: transfer 60: 0.239 s from first to last data packet, 248 data packets, 1 retransmitted, 0 dropped
+site: transfer 61: 0.129 s from first to last data packet, 38 data packets, 1 retransmitted, 0 dropped
+site: transfer 62: 0.220 s from first to last data packet, 94 data packets, 1 retransmitted, 0 dropped
+site: transfer 63: 18.748 s from first to last data packet, 12051 data packets, 53 retransmitted, 0 dropped
+site: transfer 64: 4.669 s from first to last data packet, 2609 data packets, 15 retransmitted, 0 dropped

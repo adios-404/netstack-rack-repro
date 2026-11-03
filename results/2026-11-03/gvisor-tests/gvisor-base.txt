@@ -1,0 +1,22 @@
+go: downloading github.com/google/go-cmp v0.6.0
+go: downloading github.com/google/btree v1.1.2
+go: downloading golang.org/x/sys v0.26.0
+go: downloading github.com/cenkalti/backoff v2.2.1+incompatible
+go: downloading github.com/kr/pty v1.1.5
+go: downloading github.com/opencontainers/runtime-spec v1.1.0-rc.1
+go: downloading golang.org/x/time v0.7.0
+go: downloading github.com/mohae/deepcopy v0.0.0-20170308212314-bb9b5e7adda9
+go: downloading google.golang.org/protobuf v1.33.0
+go: downloading github.com/bazelbuild/rules_go v0.44.2
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp	0.002s
+?   	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e	[no test files]
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/dual_stack_test	1.014s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/forwarder_test	1.007s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/rcv_test	0.004s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/sack_scoreboard_test	1.008s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_noracedetector_test	11.206s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_rack_test	27.503s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_sack_test	11.251s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_test	124.170s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_timestamp_test	1.010s
+?   	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/testing/context	[no test files]

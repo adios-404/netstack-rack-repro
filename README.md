@@ -553,6 +553,22 @@ for an RTO, RACK rejected the probe's sample with the minimum RTT test,
 SACKed sample with the TSecr test; all its rejections were of cumulatively
 acknowledged segments, which both versions treat alike.
 
+### Pangolin's newt and the wireguard-go netstack (2026-11-03)
+
+[newt](https://github.com/fosrl/newt), Pangolin's site connector, and
+wireguard-go's `tun/netstack` (used by flyctl, wireproxy and Sliver) run an
+older gVisor, `v0.0.0-20250503011706-39ed1f5ac29c`, with RACK on.
+`-profile wireguard-go` sets the sender up as they do (Reno, no GSO,
+gVisor's default buffers), `build-wgpin-variants.sh` builds that gVisor with
+#15432, #16081, #16659 and #16660 ported to it, and `e2e-newt/` runs newt's
+own proxy and netstack over wireguard-go against Linux WireGuard and Linux
+TCP. With RACK on, a 2.8 MB fetch that loses its tail takes about 105 s at
+3 ms and does not finish in 120 s at 30 ms; through newt end to end, 4 of 5
+did not finish in 120 s. RACK off recovers in under a second, as does
+#16081; #16659 and #16660 alone do not end the crawl on this pin. Full
+tables, and the cost of RACK off with reordering and small buffers:
+[`results/2026-11-03/`](results/2026-11-03/).
+
 ## Limits
 
 - The loss is scripted and the path is simple: no Wi-Fi aggregation, no

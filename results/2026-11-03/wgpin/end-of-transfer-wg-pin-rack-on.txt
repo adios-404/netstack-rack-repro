@@ -1,0 +1,434 @@
+sender:   gVisor v0.0.0-20250503011706-39ed1f5ac29c set up like wireguard-go's tun/netstack (RACK on, reno, no GSO)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue unlimited, MTU 1280
+loss:     in each measured fetch, deliver the first 8 data packets, then drop up to 4 for at most 0s
+workload: 24 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 14400 bytes, 3s idle before each
+
+trial 1 fetch 1 warm-up    0.024 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 10, last 7 (ssthresh 9223372036854775807 at first ACK, 5 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 7 max 10 last 7
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+trial 1 fetch 2 warm-up    0.029 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 7 data pkts in 1 ms | 0 queue drops | cwnd first 7, max 9, last 8 (ssthresh 5 at first ACK, 4 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 7 max 9 last 8
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+trial 1 fetch 3 measured   0.265 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.25s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 11, last 5 (ssthresh 4 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 11 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    8 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh     4 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 2 fetch 1 warm-up    0.011 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 2 fetch 2 warm-up    0.017 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 5 data pkts in 1 ms | 0 queue drops | cwnd first 3, max 5, last 5 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 3 max 5 last 5
+trial 2 fetch 3 measured   0.077 s |    17 data pkts,     5 retransmitted | RTOs   0
+         after 3s idle | peak 6 data pkts in 1 ms | 0 queue drops | cwnd first 6, max 9, last 5 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 3 max 9 last 5
+         gVisor stats: retransmits 5, timeouts 0, fast retransmits 1, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    17 pkts    20400 B  retx     6000 B  lost     4 | acks    9 (3 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd     6 ssthresh     2 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+
+trial 3 fetch 1 warm-up    0.008 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 3 fetch 2 warm-up    0.010 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 15, last 15 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 15 last 15
+trial 3 fetch 3 measured   0.249 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.24s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    8 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.2s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 4 fetch 1 warm-up    0.012 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 4 fetch 2 warm-up    0.009 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 4 fetch 3 measured   0.261 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.24s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    8 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 5 fetch 1 warm-up    0.041 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+trial 5 fetch 2 warm-up    0.013 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 6 data pkts in 1 ms | 0 queue drops | cwnd first 3, max 12, last 12 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 3 max 12 last 12
+trial 5 fetch 3 measured   0.226 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.23s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 10, last 5 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 10 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    8 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh     2 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.2s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 6 fetch 1 warm-up    0.010 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 6 fetch 2 warm-up    0.044 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 8 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 6 fetch 3 measured   0.483 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.47s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 9 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s     3 pkts     3600 B  retx        0 B  lost     0 | acks    0 (0 with SACK)
+  +  0.1s     9 pkts    10800 B  retx        0 B  lost     4 | acks    2 (0 with SACK)
+  +  0.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    1 (1 with SACK)
+  +  0.4s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    13 ssthresh 9223372036854775807 pipe     9 sacked     0 recovery false unacked      8 segs  rto 200ms
+  +  0.3s cwnd    18 ssthresh 9223372036854775807 pipe     4 sacked     1 recovery false unacked      3 segs  rto 200ms
+  +  0.5s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 7 fetch 1 warm-up    0.008 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 7 fetch 2 warm-up    0.063 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 7 fetch 3 measured   4.245 s |    18 data pkts,     6 retransmitted | RTOs   1 (first at +0.89s) | retransmissions per RTO interval: median 5, max 5
+         after 3s idle | peak 11 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 10, last 5 (ssthresh 9223372036854775807 at first ACK, 5 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 2 max 10 last 5
+         gVisor stats: retransmits 6, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 1
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.8s    11 pkts    13200 B  retx     1200 B  lost     3 | acks    0 (0 with SACK)
+  +  3.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    2 (0 with SACK)
+  +  3.9s     1 pkts     1200 B  retx     1200 B  lost     1 | acks    0 (0 with SACK)
+  +  4.2s     6 pkts     7200 B  retx     4800 B  lost     0 | acks    0 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.8s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  4.2s cwnd     2 ssthresh     5 pipe     2 sacked     0 recovery false unacked      8 segs  rto 3.799s
+
+trial 8 fetch 1 warm-up    0.011 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 8 fetch 2 warm-up    0.055 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+trial 8 fetch 3 measured   0.265 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.26s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 4 data pkts in 1 ms | 0 queue drops | cwnd first 2, max 5, last 5 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 2 max 5 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    6 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd     2 ssthresh     2 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 9 fetch 1 warm-up    0.026 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 9 fetch 2 warm-up    0.016 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 9 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 9 fetch 3 measured   0.301 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.28s) | retransmissions per RTO interval: median 3, max 3
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 2 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 2 max 18 last 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    5 (0 with SACK)
+  +  0.1s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  0.2s     3 pkts     3600 B  retx     3600 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    18 ssthresh 9223372036854775807 pipe     4 sacked     1 recovery false unacked      3 segs  rto 200ms
+  +  0.3s cwnd     2 ssthresh     2 pipe     2 sacked     1 recovery false unacked      2 segs  rto 200ms
+
+trial 10 fetch 1 warm-up    0.008 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 10 fetch 2 warm-up    0.025 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 10 fetch 3 measured   0.128 s |    16 data pkts,     4 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    11 pkts    13200 B  retx     1200 B  lost     3 | acks    0 (0 with SACK)
+  +  0.1s     5 pkts     6000 B  retx     3600 B  lost     1 | acks    4 (3 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    18 ssthresh 9223372036854775807 pipe     4 sacked     0 recovery false unacked      3 segs  rto 200ms
+
+trial 11 fetch 1 warm-up    0.010 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 11 fetch 2 warm-up    0.044 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 9 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 14, last 14 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 14 last 14
+trial 11 fetch 3 measured   0.341 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.34s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    6 (1 with SACK)
+  +  0.3s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 12 fetch 1 warm-up    0.017 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 5 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 16, last 16 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 16 last 16
+trial 12 fetch 2 warm-up    0.023 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 16, last 4 (ssthresh 9223372036854775807 at first ACK, 3 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 4 max 16 last 4
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+trial 12 fetch 3 measured   0.294 s |    16 data pkts,     4 retransmitted | RTOs   1 (first at +0.23s) | retransmissions per RTO interval: median 3, max 3
+         after 3s idle | peak 4 data pkts in 1 ms | 0 queue drops | cwnd first 4, max 6, last 2 (ssthresh 3 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 2 max 6 last 2
+         gVisor stats: retransmits 4, timeouts 1, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    6 (1 with SACK)
+  +  0.2s     3 pkts     3600 B  retx     3600 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd     4 ssthresh     3 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     2 ssthresh     2 pipe     2 sacked     1 recovery false unacked      2 segs  rto 200ms
+
+trial 13 fetch 1 warm-up    0.011 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 13 fetch 2 warm-up    0.009 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 13, last 13 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 13 last 13
+trial 13 fetch 3 measured   0.243 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.21s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    3 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.2s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 14 fetch 1 warm-up    0.008 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 14 fetch 2 warm-up    0.008 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 14 fetch 3 measured   0.255 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.25s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    2 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 15 fetch 1 warm-up    0.010 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 15 fetch 2 warm-up    0.007 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 15 fetch 3 measured   0.327 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.29s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    8 (1 with SACK)
+  +  0.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  0.3s     3 pkts     3600 B  retx     3600 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 16 fetch 1 warm-up    0.009 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 16 fetch 2 warm-up    0.009 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 16 fetch 3 measured   0.285 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.29s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    8 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 17 fetch 1 warm-up    0.009 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 17 fetch 2 warm-up    0.008 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 17 fetch 3 measured   0.280 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.27s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    6 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 18 fetch 1 warm-up    0.011 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 18 fetch 2 warm-up    0.009 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 18 fetch 3 measured   0.120 s |    16 data pkts,     4 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 4, timeouts 0, fast retransmits 1, SACK recoveries 1, TLP recoveries 1, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.1s    16 pkts    19200 B  retx     4800 B  lost     4 | acks    9 (3 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    11 ssthresh 9223372036854775807 pipe    11 sacked     0 recovery false unacked     10 segs  rto 200ms
+
+trial 19 fetch 1 warm-up    0.021 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 19 fetch 2 warm-up    0.031 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 9 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 13, last 13 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 13 last 13
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 0, TLP recoveries 0, spurious RTO recoveries 0
+trial 19 fetch 3 measured   0.341 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.34s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 6 data pkts in 1 ms | 0 queue drops | cwnd first 6, max 7, last 5 (ssthresh 4 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 7 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    3 (0 with SACK)
+  +  0.1s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  0.3s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd     6 ssthresh     4 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd     7 ssthresh     4 pipe     4 sacked     1 recovery false unacked      3 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 20 fetch 1 warm-up    0.008 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 20 fetch 2 warm-up    0.010 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 20 fetch 3 measured   0.264 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.26s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 6 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    3 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 21 fetch 1 warm-up    0.011 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 12, last 12 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 12 last 12
+trial 21 fetch 2 warm-up    0.019 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 8 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 21 fetch 3 measured   0.361 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.06s) | retransmissions per RTO interval: median 4, max 4
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    8 (1 with SACK)
+  +  0.3s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.4s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 22 fetch 1 warm-up    0.012 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 22 fetch 2 warm-up    0.057 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 4 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 10, last 7 (ssthresh 9223372036854775807 at first ACK, 5 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 7 max 10 last 7
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+trial 22 fetch 3 measured   0.280 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.28s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 5 data pkts in 1 ms | 0 queue drops | cwnd first 7, max 8, last 5 (ssthresh 5 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 8 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    6 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd     7 ssthresh     5 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 23 fetch 1 warm-up    0.058 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 9 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 18 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 18 last 18
+trial 23 fetch 2 warm-up    0.011 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 20, last 20 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 10 max 20 last 20
+trial 23 fetch 3 measured   0.258 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.26s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 18, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 18 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    6 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.3s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+trial 24 fetch 1 warm-up    0.018 s |    13 data pkts,     1 retransmitted | RTOs   0
+         after 3s idle | peak 10 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 19, last 2 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 2 max 19 last 2
+         gVisor stats: retransmits 1, timeouts 0, fast retransmits 0, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+trial 24 fetch 2 warm-up    0.012 s |    12 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 5 data pkts in 1 ms | 0 queue drops | cwnd first 3, max 8, last 8 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 3 max 8 last 8
+trial 24 fetch 3 measured   0.222 s |    17 data pkts,     5 retransmitted | RTOs   1 (first at +0.22s) | retransmissions per RTO interval: median 0, max 0
+         after 3s idle | peak 9 data pkts in 1 ms | 0 queue drops | cwnd first 9, max 11, last 5 (ssthresh 2 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 0 pkts, cwnd min 5 max 11 last 5
+         gVisor stats: retransmits 5, timeouts 1, fast retransmits 1, SACK recoveries 1, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    13 pkts    15600 B  retx     1200 B  lost     4 | acks    6 (1 with SACK)
+  +  0.2s     4 pkts     4800 B  retx     4800 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd     9 ssthresh     2 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.2s cwnd     5 ssthresh     2 pipe     5 sacked     0 recovery true  unacked      2 segs  rto 200ms
+
+
+measured fetches: 24, min 0.077 s, median 0.265 s, max 4.245 s, over 1 s: 1
+path drops toward the client: 0 by the queue, 96 scripted; reordered (held 200µs): 0

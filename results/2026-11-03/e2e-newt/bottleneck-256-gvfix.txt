@@ -1,0 +1,12 @@
+12:16:51.406131 site up: wireguard-go tun/netstack (newt 1.19.0), gVisor v0.0.0-20250503011706-39ed1f5ac29c (patched), proxy on 10.77.0.2:8080, scripted loss: none
+path: 30 ms RTT, uplink 50mbit, buffer 256 packets; 5 fetches of 20000000 bytes
+fetch 1:   4.142 s, 20000000 of 20000000 bytes,   38.6 Mbit/s
+fetch 2:   4.192 s, 20000000 of 20000000 bytes,   38.2 Mbit/s
+fetch 3:   4.550 s, 20000000 of 20000000 bytes,   35.2 Mbit/s
+fetch 4:   4.077 s, 20000000 of 20000000 bytes,   39.2 Mbit/s
+fetch 5:   4.100 s, 20000000 of 20000000 bytes,   39.0 Mbit/s
+site: transfer 2: 4.049 s from first to last data packet, 19224 data packets, 2127 retransmitted, 0 dropped
+site: transfer 3: 4.102 s from first to last data packet, 18888 data packets, 1796 retransmitted, 0 dropped
+site: transfer 4: 4.447 s from first to last data packet, 20570 data packets, 3475 retransmitted, 0 dropped
+site: transfer 5: 3.975 s from first to last data packet, 18594 data packets, 1498 retransmitted, 0 dropped
+site: transfer 6: 3.995 s from first to last data packet, 18609 data packets, 1457 retransmitted, 0 dropped

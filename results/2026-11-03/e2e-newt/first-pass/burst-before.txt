@@ -1,0 +1,12 @@
+11:40:33.768744 site up: wireguard-go tun/netstack (newt 1.19.0), proxy on 10.77.0.2:8080, scripted loss: keep the first 1000 data packets of each transfer, then drop all for 150ms
+path: 30 ms RTT, uplink 100mbit, queue 1000 packets; 5 fetches of 2800000 bytes
+fetch 1: 120.008 s, 2203795 of 2800000 bytes,    0.1 Mbit/s  (incomplete)
+fetch 2: 120.004 s, 2181536 of 2800000 bytes,    0.1 Mbit/s  (incomplete)
+fetch 3: 120.020 s, 2158864 of 2800000 bytes,    0.1 Mbit/s  (incomplete)
+fetch 4:  45.298 s, 2800000 of 2800000 bytes,    0.5 Mbit/s
+fetch 5: 120.011 s, 2120032 of 2800000 bytes,    0.1 Mbit/s  (incomplete)
+site: transfer 1857: 0.034 s from first to last data packet, 2 data packets, 2 retransmitted, 0 dropped
+site: transfer 1858: 0.038 s from first to last data packet, 2 data packets, 2 retransmitted, 0 dropped
+site: transfer 1859: 0.036 s from first to last data packet, 2 data packets, 2 retransmitted, 0 dropped
+site: transfer 1860: 0.034 s from first to last data packet, 2 data packets, 2 retransmitted, 0 dropped
+site: transfer 1860: 0.034 s from first to last data packet, 2 data packets, 2 retransmitted, 0 dropped

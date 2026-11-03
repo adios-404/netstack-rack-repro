@@ -1,0 +1,35 @@
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp	0.003s
+?   	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e	[no test files]
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/dual_stack_test	1.015s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/forwarder_test	1.006s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/rcv_test	0.005s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/sack_scoreboard_test	1.011s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_noracedetector_test	11.174s
+--- FAIL: TestRACKWithWindowFull (0.01s)
+    context.go:344: unexpected packet received after userTimeout has expired
+FAIL
+panic: Leak checking detected 3 leaked objects:
+	[buffer.chunk 0x44e421e20500] reference count of 1 instead of 0
+	[buffer.chunk 0x44e421c266e0] reference count of 1 instead of 0
+	[stack.PacketBuffer 0x44e421cbd540] reference count of 1 instead of 0
+	
+
+goroutine 1 [running]:
+gvisor.dev/gvisor/pkg/refs.doLeakCheck()
+	$HOME/newt-e2e/trees/fixed/pkg/refs/refs_map.go:175 +0x308
+sync.(*Once).doSlow(0x151ca0?, 0x44e421fedc30?)
+	$HOME/sdk/go1.27.3/src/sync/once.go:78 +0xdc
+sync.(*Once).Do(0x44e42201c180?, 0x44e421b3c1e0?)
+	$HOME/sdk/go1.27.3/src/sync/once.go:69 +0x24
+gvisor.dev/gvisor/pkg/refs.DoLeakCheck()
+	$HOME/newt-e2e/trees/fixed/pkg/refs/refs_map.go:132 +0x44
+gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_rack_test_test.TestMain(0x115dd00?)
+	$HOME/newt-e2e/trees/fixed/pkg/tcpip/transport/tcp/test/e2e/tcp_rack_test/tcp_rack_test.go:1079 +0x48
+main.main()
+	_testmain.go:82 +0x88
+FAIL	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_rack_test	26.500s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_sack_test	11.158s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_test	125.059s
+ok  	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/test/e2e/tcp_timestamp_test	1.012s
+?   	gvisor.dev/gvisor/pkg/tcpip/transport/tcp/testing/context	[no test files]
+FAIL

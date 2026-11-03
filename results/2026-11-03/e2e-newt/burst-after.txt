@@ -1,0 +1,12 @@
+12:10:56.075833 site up: newt netstack2 (proposed change), gVisor v0.0.0-20250503011706-39ed1f5ac29c, proxy on 10.77.0.2:8080, scripted loss: keep the first 1000 data packets of each transfer, then drop all for 150ms
+path: 30 ms RTT, uplink 100mbit, buffer 1000 packets; 5 fetches of 2800000 bytes
+fetch 1:   0.944 s, 2800000 of 2800000 bytes,   23.7 Mbit/s
+fetch 2:   0.909 s, 2800000 of 2800000 bytes,   24.6 Mbit/s
+fetch 3:   0.910 s, 2800000 of 2800000 bytes,   24.6 Mbit/s
+fetch 4:   1.004 s, 2800000 of 2800000 bytes,   22.3 Mbit/s
+fetch 5:   0.928 s, 2800000 of 2800000 bytes,   24.1 Mbit/s
+site: transfer 2: 0.853 s from first to last data packet, 3405 data packets, 1010 retransmitted, 1010 dropped
+site: transfer 3: 0.817 s from first to last data packet, 3405 data packets, 1010 retransmitted, 1010 dropped
+site: transfer 4: 0.824 s from first to last data packet, 3417 data packets, 1010 retransmitted, 1010 dropped
+site: transfer 5: 0.907 s from first to last data packet, 3416 data packets, 1010 retransmitted, 1010 dropped
+site: transfer 6: 0.842 s from first to last data packet, 3416 data packets, 1010 retransmitted, 1010 dropped

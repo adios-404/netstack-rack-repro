@@ -1,0 +1,690 @@
+sender:   gVisor v0.0.0-20250503011706-39ed1f5ac29c => /var/folders/k8/4w3d8gt54px769n_7_9b1w1w0000gn/T/tmp.V2McbpnHDZ/gvisor-wgpin-pr16659-16660 set up like wireguard-go's tun/netstack (RACK on, reno, no GSO)
+client:   gVisor, TCP timestamps on
+path:     RTT 30ms + up to 2x200µs jitter (seed 1), 100 Mbit/s toward the client, queue unlimited, MTU 1280
+loss:     in each measured fetch, deliver the first 1000 data packets, then drop up to 1400 for at most 150ms
+workload: 8 trial(s), each a new connection with 2 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 warm-up    0.398 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 168 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2247, last 2247 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2247 last 2247
+          (gVisor connection: TCP timestamps on)
+trial 1 fetch 2 warm-up    0.396 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 214 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2225, last 2225 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 55 pkts, cwnd min 10 max 2225 last 2225
+trial 1 fetch 3 measured 120.000 s |  2923 data pkts,   912 retransmitted | RTOs 456 (first at +0.56s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:19730->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 132 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 912, timeouts 456, fast retransmits 456, SACK recoveries 456, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks   26 (0 with SACK)
+  +  0.1s   588 pkts   688128 B  retx        0 B  lost     0 | acks  238 (0 with SACK)
+  +  0.2s  1352 pkts  1582464 B  retx        0 B  lost  1010 | acks  483 (0 with SACK)
+  +  0.3s     1 pkts     1200 B  retx        0 B  lost     1 | acks    0 (0 with SACK)
+  +  0.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +  0.6s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +  0.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +  1.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +  1.3s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    1 (0 with SACK)
+  +  1.4s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +  1.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +  1.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +  2.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +  2.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +  2.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +  2.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +  2.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  ... 701 more 100 ms rows ...
+  +116.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +117.0s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +117.1s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +117.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +117.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +117.6s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +117.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +118.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +118.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +118.4s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +118.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +118.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.9s     1 pkts      368 B  retx      368 B  lost     0 | acks    2 (0 with SACK)
+  +119.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +119.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +119.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +119.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +119.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 200ms
+  +  0.1s cwnd    41 ssthresh 9223372036854775807 pipe    41 sacked     0 recovery false unacked     39 segs  rto 200ms
+  +  0.2s cwnd   335 ssthresh 9223372036854775807 pipe   335 sacked     0 recovery false unacked    319 segs  rto 200ms
+  +  0.6s cwnd     5 ssthresh     2 pipe  1011 sacked     0 recovery true  unacked    962 segs  rto 200ms
+  +  0.6s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 200ms
+  +  0.9s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    960 segs  rto 200ms
+  +  1.1s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    958 segs  rto 200ms
+  +  1.4s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.4s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.6s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    955 segs  rto 200ms
+  +  1.9s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    953 segs  rto 200ms
+  +  2.2s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    951 segs  rto 200ms
+  +  2.4s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    949 segs  rto 200ms
+  +  2.7s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    947 segs  rto 200ms
+  +  2.7s cwnd     5 ssthresh     2 pipe   993 sacked     0 recovery true  unacked    946 segs  rto 200ms
+  ... 569 more rows ...
+  +117.1s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +117.3s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    114 segs  rto 200ms
+  +117.6s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    112 segs  rto 200ms
+  +117.6s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    111 segs  rto 200ms
+  +117.9s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    110 segs  rto 200ms
+  +118.1s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    108 segs  rto 200ms
+  +118.4s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    106 segs  rto 200ms
+  +118.4s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    105 segs  rto 200ms
+  +118.6s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    104 segs  rto 200ms
+  +118.9s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.2s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    101 segs  rto 200ms
+  +119.4s cwnd     5 ssthresh     2 pipe   105 sacked     0 recovery true  unacked     99 segs  rto 200ms
+  +119.7s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     97 segs  rto 200ms
+  +119.7s cwnd     5 ssthresh     2 pipe   101 sacked     0 recovery true  unacked     96 segs  rto 200ms
+  +119.9s cwnd     5 ssthresh     2 pipe   101 sacked     0 recovery true  unacked     95 segs  rto 200ms
+
+trial 2 fetch 1 warm-up    0.387 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 56 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2247, last 2247 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2247 last 2247
+trial 2 fetch 2 warm-up    0.386 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 28 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2247, last 2247 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2247 last 2247
+trial 2 fetch 3 measured 120.000 s |  2921 data pkts,   910 retransmitted | RTOs 455 (first at +0.64s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:17546->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 26 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 910, timeouts 455, fast retransmits 455, SACK recoveries 455, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks   28 (0 with SACK)
+  +  0.1s   618 pkts   723296 B  retx        0 B  lost     0 | acks  262 (0 with SACK)
+  +  0.2s  1322 pkts  1547296 B  retx        0 B  lost  1010 | acks  565 (0 with SACK)
+  +  0.3s     1 pkts     1200 B  retx        0 B  lost     0 | acks    0 (0 with SACK)
+  +  0.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  0.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  0.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  0.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  1.2s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  1.4s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    2 (2 with SACK)
+  +  1.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  1.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.0s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  2.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  2.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  ... 699 more 100 ms rows ...
+  +116.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +116.9s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +117.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +117.4s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +117.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +118.2s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +118.4s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +118.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +119.1s     1 pkts      368 B  retx      368 B  lost     0 | acks    0 (0 with SACK)
+  +119.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +119.4s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +119.5s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +119.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +119.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 205ms
+  +  0.1s cwnd    42 ssthresh 9223372036854775807 pipe    42 sacked     0 recovery false unacked     40 segs  rto 249ms
+  +  0.2s cwnd   350 ssthresh 9223372036854775807 pipe   350 sacked     0 recovery false unacked    333 segs  rto 219ms
+  +  0.4s cwnd   508 ssthresh   505 pipe  1011 sacked     0 recovery true  unacked    963 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    960 segs  rto 200ms
+  +  0.9s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    959 segs  rto 200ms
+  +  1.2s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    957 segs  rto 200ms
+  +  1.2s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.5s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.7s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    954 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    952 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    951 segs  rto 200ms
+  +  2.2s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    950 segs  rto 200ms
+  +  2.5s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    948 segs  rto 200ms
+  ... 571 more rows ...
+  +116.9s cwnd     5 ssthresh     2 pipe   123 sacked     0 recovery true  unacked    118 segs  rto 200ms
+  +117.1s cwnd     5 ssthresh     2 pipe   123 sacked     0 recovery true  unacked    117 segs  rto 200ms
+  +117.4s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +117.4s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    114 segs  rto 200ms
+  +117.7s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    113 segs  rto 200ms
+  +117.9s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    111 segs  rto 200ms
+  +118.2s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    109 segs  rto 200ms
+  +118.2s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    108 segs  rto 200ms
+  +118.4s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    107 segs  rto 200ms
+  +118.7s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    105 segs  rto 200ms
+  +119.0s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    103 segs  rto 200ms
+  +119.2s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.5s cwnd     5 ssthresh     2 pipe   105 sacked     0 recovery true  unacked    100 segs  rto 200ms
+  +119.5s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     99 segs  rto 200ms
+  +119.7s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     98 segs  rto 200ms
+
+trial 3 fetch 1 warm-up    0.386 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 58 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2247, last 2247 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2247 last 2247
+trial 3 fetch 2 warm-up    0.386 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 29 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2248, last 2248 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2248 last 2248
+trial 3 fetch 3 measured 120.000 s |  2920 data pkts,   909 retransmitted | RTOs 454 (first at +0.68s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:61372->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 76 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 909, timeouts 454, fast retransmits 455, SACK recoveries 455, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks    6 (0 with SACK)
+  +  0.1s   560 pkts   655360 B  retx        0 B  lost     0 | acks  227 (0 with SACK)
+  +  0.2s  1380 pkts  1615232 B  retx        0 B  lost  1010 | acks  493 (0 with SACK)
+  +  0.4s     2 pkts     2400 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  0.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  0.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  0.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  1.0s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  1.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.4s     1 pkts      368 B  retx      368 B  lost     0 | acks    0 (0 with SACK)
+  +  1.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  1.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  2.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.3s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  2.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  3.0s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  ... 701 more 100 ms rows ...
+  +116.9s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +117.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +117.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +117.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +117.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +118.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.4s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +118.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +119.0s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +119.2s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    2 (2 with SACK)
+  +119.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +119.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +119.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +120.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 213ms
+  +  0.1s cwnd    41 ssthresh 9223372036854775807 pipe    41 sacked     0 recovery false unacked     39 segs  rto 230ms
+  +  0.2s cwnd   344 ssthresh 9223372036854775807 pipe   344 sacked     0 recovery false unacked    327 segs  rto 236ms
+  +  0.4s cwnd   508 ssthresh   505 pipe  1011 sacked     0 recovery true  unacked    963 segs  rto 213ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 207ms
+  +  1.0s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    959 segs  rto 200ms
+  +  1.0s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    958 segs  rto 200ms
+  +  1.2s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    957 segs  rto 200ms
+  +  1.5s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.8s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    954 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    952 segs  rto 200ms
+  +  2.3s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    950 segs  rto 200ms
+  +  2.3s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    949 segs  rto 200ms
+  +  2.6s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    948 segs  rto 200ms
+  +  2.8s cwnd     5 ssthresh     2 pipe   993 sacked     0 recovery true  unacked    946 segs  rto 200ms
+  ... 575 more rows ...
+  +116.9s cwnd     5 ssthresh     2 pipe   123 sacked     0 recovery true  unacked    118 segs  rto 200ms
+  +117.1s cwnd     5 ssthresh     2 pipe   123 sacked     0 recovery true  unacked    117 segs  rto 200ms
+  +117.4s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +117.7s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    113 segs  rto 200ms
+  +117.7s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    112 segs  rto 200ms
+  +117.9s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    111 segs  rto 200ms
+  +118.2s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    109 segs  rto 200ms
+  +118.5s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    107 segs  rto 200ms
+  +118.7s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    105 segs  rto 200ms
+  +119.0s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    103 segs  rto 200ms
+  +119.0s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.2s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.5s cwnd     5 ssthresh     2 pipe   105 sacked     0 recovery true  unacked    100 segs  rto 200ms
+  +119.8s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     98 segs  rto 200ms
+  +119.8s cwnd     5 ssthresh     2 pipe   101 sacked     0 recovery true  unacked     97 segs  rto 200ms
+
+trial 4 fetch 1 warm-up    0.390 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 144 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2257, last 2257 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2257 last 2257
+trial 4 fetch 2 warm-up    0.389 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 126 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2247, last 2247 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2247 last 2247
+trial 4 fetch 3 measured 120.000 s |  2922 data pkts,   911 retransmitted | RTOs 455 (first at +0.65s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:30260->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 28 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 911, timeouts 455, fast retransmits 456, SACK recoveries 456, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks   25 (0 with SACK)
+  +  0.1s   578 pkts   676128 B  retx        0 B  lost     0 | acks  241 (0 with SACK)
+  +  0.2s  1362 pkts  1594464 B  retx        0 B  lost  1010 | acks  548 (0 with SACK)
+  +  0.3s     1 pkts     1200 B  retx        0 B  lost     0 | acks    0 (0 with SACK)
+  +  0.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  0.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  0.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  0.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  1.4s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    2 (2 with SACK)
+  +  1.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  1.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.0s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  2.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  2.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  ... 699 more 100 ms rows ...
+  +116.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +116.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +117.4s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +117.5s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +117.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +118.3s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +118.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +118.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +118.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +119.0s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    2 (2 with SACK)
+  +119.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +119.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +119.6s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +119.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 220ms
+  +  0.1s cwnd    42 ssthresh 9223372036854775807 pipe    42 sacked     0 recovery false unacked     40 segs  rto 246ms
+  +  0.2s cwnd   330 ssthresh 9223372036854775807 pipe   330 sacked     0 recovery false unacked    314 segs  rto 216ms
+  +  0.4s cwnd   508 ssthresh   505 pipe  1011 sacked     0 recovery true  unacked    963 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    960 segs  rto 200ms
+  +  0.9s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    959 segs  rto 200ms
+  +  1.2s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    957 segs  rto 200ms
+  +  1.5s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.7s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    954 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    952 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    951 segs  rto 200ms
+  +  2.3s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    950 segs  rto 200ms
+  +  2.5s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    948 segs  rto 200ms
+  +  2.8s cwnd     5 ssthresh     2 pipe   993 sacked     0 recovery true  unacked    946 segs  rto 200ms
+  ... 570 more rows ...
+  +117.2s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +117.5s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    113 segs  rto 200ms
+  +117.5s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    112 segs  rto 200ms
+  +117.7s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    111 segs  rto 200ms
+  +118.0s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    109 segs  rto 200ms
+  +118.3s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    107 segs  rto 200ms
+  +118.3s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    106 segs  rto 200ms
+  +118.5s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    105 segs  rto 200ms
+  +118.8s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    103 segs  rto 200ms
+  +118.8s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.1s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.3s cwnd     5 ssthresh     2 pipe   105 sacked     0 recovery true  unacked    100 segs  rto 200ms
+  +119.6s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     98 segs  rto 200ms
+  +119.6s cwnd     5 ssthresh     2 pipe   101 sacked     0 recovery true  unacked     97 segs  rto 200ms
+  +119.8s cwnd     5 ssthresh     2 pipe   101 sacked     0 recovery true  unacked     96 segs  rto 200ms
+
+trial 5 fetch 1 warm-up    0.386 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 29 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2247, last 2247 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2247 last 2247
+trial 5 fetch 2 warm-up    0.386 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 26 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2248, last 2248 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2248 last 2248
+trial 5 fetch 3 measured 120.000 s |  2912 data pkts,   901 retransmitted | RTOs 450 (first at +0.64s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:62298->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 26 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 901, timeouts 450, fast retransmits 451, SACK recoveries 451, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks   25 (0 with SACK)
+  +  0.1s   622 pkts   728096 B  retx        0 B  lost     0 | acks  257 (0 with SACK)
+  +  0.2s  1318 pkts  1542496 B  retx        0 B  lost  1010 | acks  563 (0 with SACK)
+  +  0.3s     1 pkts     1200 B  retx        0 B  lost     0 | acks    0 (0 with SACK)
+  +  0.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  0.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  0.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  0.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  1.2s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  1.4s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    2 (2 with SACK)
+  +  1.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  1.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.0s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  2.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  2.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  ... 695 more 100 ms rows ...
+  +116.7s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    2 (2 with SACK)
+  +116.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +117.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +117.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +118.0s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +118.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +118.6s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +118.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +119.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +119.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +119.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +119.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +119.9s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 205ms
+  +  0.1s cwnd    41 ssthresh 9223372036854775807 pipe    41 sacked     0 recovery false unacked     39 segs  rto 247ms
+  +  0.2s cwnd   353 ssthresh 9223372036854775807 pipe   353 sacked     0 recovery false unacked    336 segs  rto 221ms
+  +  0.4s cwnd   508 ssthresh   505 pipe  1011 sacked     0 recovery true  unacked    963 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    960 segs  rto 200ms
+  +  0.9s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    959 segs  rto 200ms
+  +  1.2s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    957 segs  rto 200ms
+  +  1.2s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.5s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.7s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    954 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    952 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    951 segs  rto 200ms
+  +  2.2s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    950 segs  rto 200ms
+  +  2.5s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    948 segs  rto 200ms
+  ... 562 more rows ...
+  +117.3s cwnd     5 ssthresh     2 pipe   132 sacked     0 recovery true  unacked    126 segs  rto 200ms
+  +117.3s cwnd     5 ssthresh     2 pipe   130 sacked     0 recovery true  unacked    125 segs  rto 200ms
+  +117.5s cwnd     5 ssthresh     2 pipe   130 sacked     0 recovery true  unacked    124 segs  rto 200ms
+  +117.8s cwnd     5 ssthresh     2 pipe   128 sacked     0 recovery true  unacked    122 segs  rto 200ms
+  +117.8s cwnd     5 ssthresh     2 pipe   126 sacked     0 recovery true  unacked    121 segs  rto 200ms
+  +118.1s cwnd     5 ssthresh     2 pipe   126 sacked     0 recovery true  unacked    120 segs  rto 200ms
+  +118.3s cwnd     5 ssthresh     2 pipe   124 sacked     0 recovery true  unacked    118 segs  rto 200ms
+  +118.6s cwnd     5 ssthresh     2 pipe   122 sacked     0 recovery true  unacked    116 segs  rto 200ms
+  +118.6s cwnd     5 ssthresh     2 pipe   120 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +118.8s cwnd     5 ssthresh     2 pipe   120 sacked     0 recovery true  unacked    114 segs  rto 200ms
+  +119.1s cwnd     5 ssthresh     2 pipe   118 sacked     0 recovery true  unacked    112 segs  rto 200ms
+  +119.4s cwnd     5 ssthresh     2 pipe   116 sacked     0 recovery true  unacked    110 segs  rto 200ms
+  +119.6s cwnd     5 ssthresh     2 pipe   114 sacked     0 recovery true  unacked    108 segs  rto 200ms
+  +119.9s cwnd     5 ssthresh     2 pipe   112 sacked     0 recovery true  unacked    106 segs  rto 200ms
+  +119.9s cwnd     5 ssthresh     2 pipe   110 sacked     0 recovery true  unacked    105 segs  rto 200ms
+
+trial 6 fetch 1 warm-up    0.393 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 171 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2189, last 2189 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2189 last 2189
+trial 6 fetch 2 warm-up    0.407 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 230 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2248, last 2248 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 55 pkts, cwnd min 10 max 2248 last 2248
+trial 6 fetch 3 measured 120.001 s |  2922 data pkts,   911 retransmitted | RTOs 455 (first at +0.66s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:17929->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 198 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 911, timeouts 455, fast retransmits 456, SACK recoveries 456, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks   25 (0 with SACK)
+  +  0.1s   494 pkts   577824 B  retx        0 B  lost     0 | acks  143 (0 with SACK)
+  +  0.2s  1446 pkts  1692768 B  retx        0 B  lost  1010 | acks  293 (0 with SACK)
+  +  0.3s     1 pkts     1200 B  retx        0 B  lost     0 | acks    0 (0 with SACK)
+  +  0.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  0.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  0.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  0.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  1.4s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    1 (1 with SACK)
+  +  1.5s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  1.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  2.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  2.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  ... 699 more 100 ms rows ...
+  +116.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +117.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +117.3s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +117.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +117.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +118.0s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +118.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +118.6s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +118.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +119.0s     1 pkts      368 B  retx      368 B  lost     0 | acks    0 (0 with SACK)
+  +119.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +119.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +119.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +119.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +119.9s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 230ms
+  +  0.1s cwnd    42 ssthresh 9223372036854775807 pipe    42 sacked     0 recovery false unacked     40 segs  rto 222ms
+  +  0.2s cwnd   297 ssthresh 9223372036854775807 pipe   297 sacked     0 recovery false unacked    283 segs  rto 200ms
+  +  0.4s cwnd   508 ssthresh   505 pipe  1011 sacked     0 recovery true  unacked    963 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 200ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    960 segs  rto 200ms
+  +  1.0s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    959 segs  rto 200ms
+  +  1.2s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    957 segs  rto 200ms
+  +  1.5s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.5s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    955 segs  rto 200ms
+  +  1.7s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    954 segs  rto 200ms
+  +  2.0s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    952 segs  rto 200ms
+  +  2.3s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    950 segs  rto 200ms
+  +  2.5s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    948 segs  rto 200ms
+  +  2.8s cwnd     5 ssthresh     2 pipe   993 sacked     0 recovery true  unacked    946 segs  rto 200ms
+  ... 571 more rows ...
+  +117.3s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +117.3s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    114 segs  rto 200ms
+  +117.5s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    113 segs  rto 200ms
+  +117.8s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    111 segs  rto 200ms
+  +117.8s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    110 segs  rto 200ms
+  +118.1s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    109 segs  rto 200ms
+  +118.3s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    107 segs  rto 200ms
+  +118.6s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    105 segs  rto 200ms
+  +118.6s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    104 segs  rto 200ms
+  +118.8s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    103 segs  rto 200ms
+  +119.1s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.4s cwnd     5 ssthresh     2 pipe   105 sacked     0 recovery true  unacked    100 segs  rto 200ms
+  +119.6s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     98 segs  rto 200ms
+  +119.9s cwnd     5 ssthresh     2 pipe   101 sacked     0 recovery true  unacked     96 segs  rto 200ms
+  +119.9s cwnd     5 ssthresh     2 pipe    99 sacked     0 recovery true  unacked     95 segs  rto 200ms
+
+trial 7 fetch 1 warm-up    0.387 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 54 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2248, last 2248 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2248 last 2248
+trial 7 fetch 2 warm-up    0.402 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 136 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2269, last 2269 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2269 last 2269
+trial 7 fetch 3 measured 120.021 s |  2914 data pkts,   903 retransmitted | RTOs 451 (first at +0.57s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:16137->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 84 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 902, timeouts 451, fast retransmits 451, SACK recoveries 451, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks   17 (0 with SACK)
+  +  0.1s   566 pkts   662560 B  retx        0 B  lost     0 | acks  227 (0 with SACK)
+  +  0.2s  1374 pkts  1608032 B  retx        0 B  lost  1010 | acks  489 (0 with SACK)
+  +  0.3s     1 pkts     1200 B  retx        0 B  lost     1 | acks    0 (0 with SACK)
+  +  0.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +  0.6s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +  0.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +  1.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +  1.3s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    1 (0 with SACK)
+  +  1.4s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +  1.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +  1.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +  2.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +  2.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +  2.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +  2.7s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +  2.9s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  ... 699 more 100 ms rows ...
+  +117.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +117.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +117.4s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +117.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +117.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +118.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +118.2s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +118.4s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +118.5s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +118.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +118.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +119.2s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (0 with SACK)
+  +119.4s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (0 with SACK)
+  +119.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (0 with SACK)
+  +119.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (0 with SACK)
+  +120.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 201ms
+  +  0.1s cwnd    41 ssthresh 9223372036854775807 pipe    41 sacked     0 recovery false unacked     39 segs  rto 200ms
+  +  0.2s cwnd   325 ssthresh 9223372036854775807 pipe   325 sacked     0 recovery false unacked    310 segs  rto 200ms
+  +  0.6s cwnd     5 ssthresh     2 pipe  1011 sacked     0 recovery true  unacked    962 segs  rto 200ms
+  +  0.6s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 200ms
+  +  0.9s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    960 segs  rto 200ms
+  +  1.1s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    958 segs  rto 200ms
+  +  1.4s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.4s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.6s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    955 segs  rto 200ms
+  +  1.9s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    953 segs  rto 200ms
+  +  2.2s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    951 segs  rto 200ms
+  +  2.4s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    949 segs  rto 200ms
+  +  2.7s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    947 segs  rto 200ms
+  +  2.7s cwnd     5 ssthresh     2 pipe   993 sacked     0 recovery true  unacked    946 segs  rto 200ms
+  ... 569 more rows ...
+  +117.1s cwnd     5 ssthresh     2 pipe   131 sacked     0 recovery true  unacked    124 segs  rto 200ms
+  +117.4s cwnd     5 ssthresh     2 pipe   129 sacked     0 recovery true  unacked    122 segs  rto 200ms
+  +117.4s cwnd     5 ssthresh     2 pipe   127 sacked     0 recovery true  unacked    121 segs  rto 200ms
+  +117.7s cwnd     5 ssthresh     2 pipe   127 sacked     0 recovery true  unacked    120 segs  rto 200ms
+  +117.9s cwnd     5 ssthresh     2 pipe   125 sacked     0 recovery true  unacked    118 segs  rto 200ms
+  +118.2s cwnd     5 ssthresh     2 pipe   123 sacked     0 recovery true  unacked    116 segs  rto 200ms
+  +118.2s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +118.5s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    114 segs  rto 200ms
+  +118.5s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    113 segs  rto 200ms
+  +118.7s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    112 segs  rto 200ms
+  +119.0s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    110 segs  rto 200ms
+  +119.3s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    108 segs  rto 200ms
+  +119.5s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    106 segs  rto 200ms
+  +119.8s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    104 segs  rto 200ms
+  +119.8s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    103 segs  rto 200ms
+
+trial 8 fetch 1 warm-up    0.388 s |  2394 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 114 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2248, last 2248 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 58 pkts, cwnd min 10 max 2248 last 2248
+trial 8 fetch 2 warm-up    0.392 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 65 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 2277, last 2277 (ssthresh 9223372036854775807 at first ACK, 9223372036854775807 at last)
+         sender: max phantom Outstanding (outside recovery) 57 pkts, cwnd min 10 max 2277 last 2277
+trial 8 fetch 3 measured 120.000 s |  2922 data pkts,   911 retransmitted | RTOs 455 (first at +0.72s) | retransmissions per RTO interval: median 2, max 3  ERROR: read tcp 10.9.0.2:36086->10.9.0.1:8080: i/o timeout
+         after 3s idle | peak 190 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 1010, last 5 (ssthresh 9223372036854775807 at first ACK, 2 at last)
+         sender: max phantom Outstanding (outside recovery) 47 pkts, cwnd min 5 max 1010 last 5
+         gVisor stats: retransmits 911, timeouts 455, fast retransmits 456, SACK recoveries 456, TLP recoveries 0, spurious RTO recoveries 0
+  wire trace at the server (data sent before loss; ACKs received):
+  +  0.0s    70 pkts    82336 B  retx        0 B  lost     0 | acks    7 (0 with SACK)
+  +  0.1s   495 pkts   579024 B  retx        0 B  lost     0 | acks  124 (0 with SACK)
+  +  0.2s  1445 pkts  1691568 B  retx        0 B  lost  1010 | acks  295 (0 with SACK)
+  +  0.4s     2 pkts     2400 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  0.7s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.0s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  1.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  1.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  1.5s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    1 (1 with SACK)
+  +  1.6s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  1.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.0s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +  2.1s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +  2.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.4s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  2.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  2.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +  2.9s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +  3.1s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +  3.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  ... 699 more 100 ms rows ...
+  +116.8s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +117.0s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.2s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.3s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +117.5s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +117.7s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +117.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.0s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +118.1s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +118.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +118.5s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +118.6s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  +118.8s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +118.9s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +119.1s     2 pkts     1568 B  retx     1568 B  lost     0 | acks    2 (2 with SACK)
+  +119.3s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    1 (1 with SACK)
+  +119.4s     0 pkts        0 B  retx        0 B  lost     0 | acks    1 (1 with SACK)
+  +119.6s     2 pkts     2400 B  retx     2400 B  lost     0 | acks    2 (2 with SACK)
+  +119.8s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    0 (0 with SACK)
+  +119.9s     1 pkts     1200 B  retx     1200 B  lost     0 | acks    2 (2 with SACK)
+  gVisor sender state after each ACK (first per 100 ms):
+  +  0.0s cwnd    10 ssthresh 9223372036854775807 pipe     0 sacked     0 recovery false unacked      0 segs  rto 229ms
+  +  0.1s cwnd    42 ssthresh 9223372036854775807 pipe    42 sacked     0 recovery false unacked     40 segs  rto 240ms
+  +  0.2s cwnd   321 ssthresh 9223372036854775807 pipe   321 sacked     0 recovery false unacked    306 segs  rto 240ms
+  +  0.5s cwnd   508 ssthresh   505 pipe  1011 sacked     0 recovery true  unacked    963 segs  rto 228ms
+  +  0.7s cwnd     5 ssthresh     2 pipe  1009 sacked     0 recovery true  unacked    961 segs  rto 222ms
+  +  1.0s cwnd     5 ssthresh     2 pipe  1007 sacked     0 recovery true  unacked    959 segs  rto 214ms
+  +  1.3s cwnd     5 ssthresh     2 pipe  1005 sacked     0 recovery true  unacked    957 segs  rto 203ms
+  +  1.6s cwnd     5 ssthresh     2 pipe  1003 sacked     0 recovery true  unacked    956 segs  rto 200ms
+  +  1.6s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    955 segs  rto 200ms
+  +  1.8s cwnd     5 ssthresh     2 pipe  1001 sacked     0 recovery true  unacked    954 segs  rto 200ms
+  +  2.1s cwnd     5 ssthresh     2 pipe   999 sacked     0 recovery true  unacked    952 segs  rto 200ms
+  +  2.4s cwnd     5 ssthresh     2 pipe   997 sacked     0 recovery true  unacked    950 segs  rto 200ms
+  +  2.4s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    949 segs  rto 200ms
+  +  2.6s cwnd     5 ssthresh     2 pipe   995 sacked     0 recovery true  unacked    948 segs  rto 200ms
+  +  2.9s cwnd     5 ssthresh     2 pipe   993 sacked     0 recovery true  unacked    946 segs  rto 200ms
+  ... 571 more rows ...
+  +117.0s cwnd     5 ssthresh     2 pipe   123 sacked     0 recovery true  unacked    117 segs  rto 200ms
+  +117.3s cwnd     5 ssthresh     2 pipe   121 sacked     0 recovery true  unacked    115 segs  rto 200ms
+  +117.6s cwnd     5 ssthresh     2 pipe   119 sacked     0 recovery true  unacked    113 segs  rto 200ms
+  +117.8s cwnd     5 ssthresh     2 pipe   117 sacked     0 recovery true  unacked    111 segs  rto 200ms
+  +118.1s cwnd     5 ssthresh     2 pipe   115 sacked     0 recovery true  unacked    109 segs  rto 200ms
+  +118.1s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    108 segs  rto 200ms
+  +118.3s cwnd     5 ssthresh     2 pipe   113 sacked     0 recovery true  unacked    107 segs  rto 200ms
+  +118.6s cwnd     5 ssthresh     2 pipe   111 sacked     0 recovery true  unacked    105 segs  rto 200ms
+  +118.9s cwnd     5 ssthresh     2 pipe   109 sacked     0 recovery true  unacked    103 segs  rto 200ms
+  +118.9s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.1s cwnd     5 ssthresh     2 pipe   107 sacked     0 recovery true  unacked    102 segs  rto 200ms
+  +119.4s cwnd     5 ssthresh     2 pipe   105 sacked     0 recovery true  unacked    100 segs  rto 200ms
+  +119.4s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     99 segs  rto 200ms
+  +119.7s cwnd     5 ssthresh     2 pipe   103 sacked     0 recovery true  unacked     98 segs  rto 200ms
+  +119.9s cwnd     5 ssthresh     2 pipe   101 sacked     0 recovery true  unacked     96 segs  rto 200ms
+
+
+measured fetches: 8, min 120.000 s, median 120.000 s, max 120.021 s, over 1 s: 8
+path drops toward the client: 0 by the queue, 8082 scripted; reordered (held 200µs): 0
