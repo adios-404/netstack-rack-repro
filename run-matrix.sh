@@ -6,6 +6,9 @@
 # Usage: ./run-matrix.sh <scenario> [flags]
 # Set ONLY to an extended regular expression to run only the variants whose
 # whole names match it, e.g. ONLY='gvisor-pin-rack-on|linux-kernel-cubic'.
+# Set OUT to save under another directory, e.g. for runs with extra flags.
+# The wg-* variants are gVisor set up like wireguard-go's tun/netstack, as in
+# Pangolin's newt; build them with ./build-wgpin-variants.sh.
 #
 # All scenarios: 3 ms RTT plus up to 2 x 200 us of jitter, 80 Mbit/s toward the
 # client, MTU 1280, 2.8 MB fetches unless noted, 3 s idle before each fetch.
@@ -65,7 +68,7 @@ mid-flight-hole-24-trials) flags=(-trials 24 -burst-drop 16 -burst-window 0) ;;
   ;;
 esac
 flags+=(-trace "$@")
-out="results/$(date -u +%Y-%m-%d)"
+out="${OUT:-results/$(date -u +%Y-%m-%d)}"
 mkdir -p "$out"
 run() {
   local name="$1"; shift
@@ -97,4 +100,10 @@ run gvisor-master-pr15432-16081-tlpnew-rack-on bin/repro-master-pr15432-16081-tl
 run gvisor-master-pr15432-16081-tsecr-tlpnew-rack-on bin/repro-master-pr15432-16081-tsecr-tlpnew
 run gvisor-master-pr16495-rack-on        bin/repro-master-pr16495
 run gvisor-master-pr15432-16081-16495-16419-rack-on bin/repro-master-pr15432-16081-16495-16419
+run wg-pin-rack-on                       bin/repro-wgpin -profile wireguard-go
+run wg-pin-rack-off                      bin/repro-wgpin -profile wireguard-go -rack=false
+run wg-pr16659-16660-rack-on             bin/repro-wgpin-pr16659-16660 -profile wireguard-go
+run wg-pr16081-rack-on                   bin/repro-wgpin-pr16081 -profile wireguard-go
+run wg-pr15432-16081-rack-on             bin/repro-wgpin-pr15432-16081 -profile wireguard-go
+run wg-pr15432-16081-16659-16660-rack-on bin/repro-wgpin-pr15432-16081-16659-16660 -profile wireguard-go
 run linux-kernel-cubic                   ./run-linux-sender.sh

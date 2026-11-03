@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	"gvisor.dev/gvisor/pkg/buffer"
@@ -56,7 +57,9 @@ func newTailscaleStack(name string, addr tcpip.Address, mtu uint32, cfg tailscal
 	opts := stack.Options{
 		NetworkProtocols:   []stack.NetworkProtocolFactory{ipv4.NewProtocol, ipv6.NewProtocol},
 		TransportProtocols: []stack.TransportProtocolFactory{tcp.NewProtocolProbe(probe), udp.NewProtocol},
-		ClockResolution:    cfg.clockRes,
+	}
+	if err := setClockResolution(&opts, cfg.clockRes); err != nil {
+		return nil, err
 	}
 	s := stack.New(opts)
 	ccOpt := tcpip.CongestionControlOption(cfg.cc)
@@ -83,6 +86,61 @@ func newTailscaleStack(name string, addr tcpip.Address, mtu uint32, cfg tailscal
 	if cfg.hostGSO {
 		link.SupportedGSOKind = stack.HostGSOSupported
 	}
+	return attachNIC(name, s, link, addr)
+}
+
+// setClockResolution sets stack.Options.ClockResolution.
+// Why: the field arrived in gVisor in 2026 (#14710), and older pins, such as
+// the one wireguard-go and newt use, have no such field, so it is set by name
+// to keep one source building against both.
+func setClockResolution(opts *stack.Options, res time.Duration) error {
+	f := reflect.ValueOf(opts).Elem().FieldByName("ClockResolution")
+	if !f.IsValid() {
+		if res != 0 {
+			return fmt.Errorf("this gVisor has no stack.Options.ClockResolution")
+		}
+		return nil
+	}
+	f.Set(reflect.ValueOf(res))
+	return nil
+}
+
+// newWireGuardGoStack builds a stack configured like wireguard-go's
+// tun/netstack, which Pangolin's newt uses for its main tunnel, and which
+// flyctl, wireproxy and Sliver use too (verified 2026-11-03 against
+// tun/netstack/tun.go at golang.zx2c4.com/wireguard
+// v0.0.0-20250521234502-f333402bd9cb, the version newt 1.19.0 pins; master
+// b3bc704ef0ee has the same file):
+//   - Reno, gVisor's default; it sets no congestion control.
+//   - SACK on, set explicitly; RACK left at gVisor's default, which is on.
+//   - gVisor's default buffer ranges.
+//   - A channel endpoint with 1024 slots, no GSO and no checksum offload.
+//
+// newt's own copy of that file (netstack2, for its client tunnels) sets the
+// same TCP options.
+func newWireGuardGoStack(name string, addr tcpip.Address, mtu uint32, rack bool, cc string, probe tcp.TCPProbeFunc) (*gvisorHost, error) {
+	s := stack.New(stack.Options{
+		NetworkProtocols:   []stack.NetworkProtocolFactory{ipv4.NewProtocol, ipv6.NewProtocol},
+		TransportProtocols: []stack.TransportProtocolFactory{tcp.NewProtocolProbe(probe), udp.NewProtocol},
+		HandleLocal:        true,
+	})
+	sack := tcpip.TCPSACKEnabled(true)
+	if err := s.SetTransportProtocolOption(tcp.ProtocolNumber, &sack); err != nil {
+		return nil, fmt.Errorf("enable SACK: %v", err)
+	}
+	if cc != "reno" {
+		ccOpt := tcpip.CongestionControlOption(cc)
+		if err := s.SetTransportProtocolOption(tcp.ProtocolNumber, &ccOpt); err != nil {
+			return nil, fmt.Errorf("set congestion control %q: %v", cc, err)
+		}
+	}
+	if !rack {
+		recovery := tcpip.TCPRecovery(0)
+		if err := s.SetTransportProtocolOption(tcp.ProtocolNumber, &recovery); err != nil {
+			return nil, fmt.Errorf("disable RACK: %v", err)
+		}
+	}
+	link := &gsoLinkEndpoint{Endpoint: channel.New(1024, mtu, "")}
 	return attachNIC(name, s, link, addr)
 }
 

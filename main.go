@@ -32,6 +32,7 @@ import (
 
 var (
 	senderFlag   = flag.String("sender", "gvisor", "TCP sender: gvisor (configured like Tailscale's netstack) or linux (kernel TCP over TUN; use run-linux-sender.sh)")
+	profileFlag  = flag.String("profile", "tailscale", "gVisor sender: tailscale (wgengine/netstack) or wireguard-go (tun/netstack, as in Pangolin's newt; Reno, no GSO, default buffers; ignores -gso and -clock-res)")
 	rackFlag     = flag.Bool("rack", true, "gVisor sender: RACK loss detection (on since Tailscale 1.104.0)")
 	ccFlag       = flag.String("cc", "cubic", "gVisor sender: congestion control (Tailscale sets cubic)")
 	gsoFlag      = flag.Bool("gso", true, "gVisor sender: host GSO up to 64 KiB, as Tailscale uses on Linux")
@@ -126,8 +127,23 @@ func main() {
 	switch *senderFlag {
 	case "gvisor":
 		rec = &senderRecorder{localPort: serverPort}
-		cfg := tailscaleTCPConfig{rack: *rackFlag, cc: *ccFlag, hostGSO: *gsoFlag, clockRes: *clockResFlag}
-		serverHost, err = newTailscaleStack("server", serverAddr, uint32(*mtuFlag), cfg, rec.probe)
+		switch *profileFlag {
+		case "tailscale":
+			cfg := tailscaleTCPConfig{rack: *rackFlag, cc: *ccFlag, hostGSO: *gsoFlag, clockRes: *clockResFlag}
+			serverHost, err = newTailscaleStack("server", serverAddr, uint32(*mtuFlag), cfg, rec.probe)
+			describe = fmt.Sprintf("gVisor %s (RACK %s, %s, host GSO %t, clock resolution %v)", gvisorVersion(), onOff(*rackFlag), *ccFlag, *gsoFlag, *clockResFlag)
+		case "wireguard-go":
+			// Why: -cc and -gso default to Tailscale's settings; wireguard-go's
+			// netstack sets no congestion control (Reno) and has no GSO.
+			cc := "reno"
+			if flagSet("cc") {
+				cc = *ccFlag
+			}
+			serverHost, err = newWireGuardGoStack("server", serverAddr, uint32(*mtuFlag), *rackFlag, cc, rec.probe)
+			describe = fmt.Sprintf("gVisor %s set up like wireguard-go's tun/netstack (RACK %s, %s, no GSO)", gvisorVersion(), onOff(*rackFlag), cc)
+		default:
+			log.Fatalf("unknown -profile %q", *profileFlag)
+		}
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -137,7 +153,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		describe = fmt.Sprintf("gVisor %s (RACK %s, %s, host GSO %t, clock resolution %v)", gvisorVersion(), onOff(*rackFlag), *ccFlag, *gsoFlag, *clockResFlag)
 	case "linux":
 		if err := requireOwnNetns(); err != nil {
 			log.Fatal(err)
@@ -413,6 +428,17 @@ func printSummary(results []fetchResult) {
 	slices.Sort(times)
 	fmt.Printf("\nmeasured fetches: %d, min %.3f s, median %.3f s, max %.3f s, over 1 s: %d\n",
 		len(times), times[0].Seconds(), times[len(times)/2].Seconds(), times[len(times)-1].Seconds(), slow)
+}
+
+// flagSet reports whether the named flag was given on the command line.
+func flagSet(name string) bool {
+	set := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			set = true
+		}
+	})
+	return set
 }
 
 func gvisorVersion() string {
