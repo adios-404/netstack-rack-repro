@@ -1,0 +1,39 @@
+goos: darwin
+pkg: netstack-rack-repro
+                                       │    carry     │               step8                │
+                                       │    sec/op    │   sec/op     vs base               │
+Reorder/lan-1pct-200us/rack=off/ts=off    1.321 ±  4%    1.327 ± 5%       ~ (p=0.376 n=16)
+Reorder/lan-1pct-200us/rack=off/ts=on    268.0m ± 10%   266.0m ± 6%       ~ (p=0.978 n=16)
+Reorder/lan-1pct-200us/rack=on/ts=on     196.0m ±  3%   191.5m ± 5%       ~ (p=0.336 n=16)
+Reorder/lan-noreorder/rack=off/ts=on     169.0m ±  1%   169.0m ± 1%       ~ (p=0.402 n=16)
+geomean                                  329.1m         326.9m       -0.65%
+
+                                       │     carry     │                step8                 │
+                                       │    retx/op    │   retx/op    vs base                 │
+Reorder/lan-1pct-200us/rack=off/ts=off   94.50 ±  5%     97.00 ± 11%       ~ (p=0.993 n=16)
+Reorder/lan-1pct-200us/rack=off/ts=on    156.5 ±  7%     156.0 ±  8%       ~ (p=0.889 n=16)
+Reorder/lan-1pct-200us/rack=on/ts=on     52.00 ± 12%     52.50 ±  9%       ~ (p=0.787 n=16)
+Reorder/lan-noreorder/rack=off/ts=on     0.000 ±  0%     0.000 ±  0%       ~ (p=1.000 n=16) ¹
+geomean                                              ²                +0.82%                ²
+¹ all samples are equal
+² summaries must be >0 to compute geomean
+
+                                       │    carry     │                step8                │
+                                       │   rtos/op    │  rtos/op    vs base                 │
+Reorder/lan-1pct-200us/rack=off/ts=off   0.000 ± 0%     0.000 ± 0%       ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=off/ts=on    0.000 ± 0%     0.000 ± 0%       ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=on/ts=on     0.000 ± 0%     0.000 ± 0%       ~ (p=1.000 n=16) ¹
+Reorder/lan-noreorder/rack=off/ts=on     0.000 ± 0%     0.000 ± 0%       ~ (p=1.000 n=16) ¹
+geomean                                             ²               +0.00%                ²
+¹ all samples are equal
+² summaries must be >0 to compute geomean
+
+                                       │      carry      │                  step8                   │
+                                       │ spurious-rto/op │ spurious-rto/op  vs base                 │
+Reorder/lan-1pct-200us/rack=off/ts=off      0.000 ± 0%          0.000 ± 0%       ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=off/ts=on       0.000 ± 0%          0.000 ± 0%       ~ (p=1.000 n=16) ¹
+Reorder/lan-1pct-200us/rack=on/ts=on        0.000 ± 0%          0.000 ± 0%       ~ (p=1.000 n=16) ¹
+Reorder/lan-noreorder/rack=off/ts=on        0.000 ± 0%          0.000 ± 0%       ~ (p=1.000 n=16) ¹
+geomean                                                ²                    +0.00%                ²
+¹ all samples are equal
+² summaries must be >0 to compute geomean

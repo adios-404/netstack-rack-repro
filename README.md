@@ -207,7 +207,9 @@ congestion window reduction of a recovery found to be spurious (RFC 4015;
 to Tailscale's netstack is measured on real hardware in
 [tailscale/tailscale#21651](https://github.com/tailscale/tailscale/issues/21651).
 Both changes, measured on gVisor master with Tailscale's settings, are in
-[`results/2026-10-31/reorder/`](results/2026-10-31/reorder/).
+[`results/2026-10-31/reorder/`](results/2026-10-31/reorder/). A rerun of
+#14458, rebased onto a newer master, is in
+[`results/2026-11-05/reorder/`](results/2026-11-05/reorder/).
 
 ## Results (2026-10-27 to 2026-10-30)
 
