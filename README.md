@@ -16,7 +16,8 @@ Checked on 2026-10-27 against:
 
 - Tailscale v1.104.2, which pins
   `gvisor.dev/gvisor v0.0.0-20260915211658-a6f909f08a72` (v1.104.4, released
-  on 2026-10-28, pins the same);
+  on 2026-10-28, pins the same, and so does v1.104.5, released on
+  2026-11-03 with RACK turned off);
 - gVisor master `4777ee78` (2026-10-27) and its `go` branch export
   `a68437cf`;
 - the open gVisor PRs, at their heads on that day:
@@ -81,7 +82,7 @@ each 100 ms, from gVisor's TCP probe.
 
 ```sh
 ./build-variants.sh                  # bin/repro-*, see below
-bin/repro-pin -trace                 # gVisor as Tailscale 1.104.x ships it
+bin/repro-pin -trace                 # gVisor as Tailscale 1.104.0 to 1.104.4 ship it
 bin/repro-pin -rack=false -trace     # the same with RACK off
 ./run-linux-sender.sh -trace         # Linux kernel TCP (needs root or user namespaces)
 ./run-matrix.sh default              # one scenario, every variant, saved under results/
@@ -257,7 +258,7 @@ arriving; `end-of-transfer` and `end-of-transfer-no-ts` are below.
 
 | sender | tail and probe lost | probe arrives | probe arrives, client without timestamps | hole mid-flight |
 |---|---|---|---|---|
-| gVisor pin, RACK on (Tailscale 1.104.x) | 3.54–6.03 s (15–27 RTOs) | 3.52–5.82 s (15–26 RTOs) | 0.30 s, but 4 of 8 unfinished at 120 s (0–9 RTOs) | 0.30–0.32 s (0 RTOs) |
+| gVisor pin, RACK on (Tailscale 1.104.0–1.104.4) | 3.54–6.03 s (15–27 RTOs) | 3.52–5.82 s (15–26 RTOs) | 0.30 s, but 4 of 8 unfinished at 120 s (0–9 RTOs) | 0.30–0.32 s (0 RTOs) |
 | gVisor pin, RACK on, no GSO | 3.76–11.2 s (16–52 RTOs) | 3.54–51.3 s (15–245 RTOs) | 0.30 s, but 1 of 8 unfinished at 120 s (0–9 RTOs) | 0.30–0.33 s (0 RTOs) |
 | gVisor pin, RACK off (TCPRecovery(0), the 1.82–1.102 setting) | 0.52–0.55 s (1 RTO) | 0.32–0.56 s (0–1 RTOs) | 0.30–0.52 s (0–1 RTOs) | 0.30–0.32 s (0 RTOs) |
 | pin + #15432 | 0.64–0.66 s (1 RTO) | 0.32–0.65 s (0–1 RTOs) | 0.30–1.22 s (0–1 RTOs) | 0.30–0.33 s (0 RTOs) |
@@ -283,7 +284,7 @@ to 7 in the raw output after the two warm-ups):
 
 | sender | measured fetches 1–5 |
 |---|---|
-| gVisor pin, RACK on (Tailscale 1.104.x) | 3.53, 42.1, 47.3, 48.7, 50.4 s |
+| gVisor pin, RACK on (Tailscale 1.104.0–1.104.4) | 3.53, 42.1, 47.3, 48.7, 50.4 s |
 | gVisor pin, RACK on, no GSO | 4.16, 39.2, 39.4, 45.8, 47.5 s |
 | gVisor pin, RACK off (TCPRecovery(0), the 1.82–1.102 setting) | 0.54, 0.55, 0.55, 0.56, 0.56 s |
 | pin + #15432 | 0.67, 0.91, 0.90, 0.89, 0.89 s |
@@ -319,7 +320,7 @@ The same scenario with eight trials:
 
 | sender | trials | fetch time | trials without an RTO |
 |---|---|---|---|
-| gVisor pin, RACK on (Tailscale 1.104.x) | 8 | 3.52–5.82 s, median 3.94 s | 0 of 8 |
+| gVisor pin, RACK on (Tailscale 1.104.0–1.104.4) | 8 | 3.52–5.82 s, median 3.94 s | 0 of 8 |
 | gVisor pin, RACK on, no GSO | 8 | 3.54–51.3 s, median 3.94 s | 0 of 8 |
 | gVisor pin, RACK off (TCPRecovery(0), the 1.82–1.102 setting) | 8 | 0.32–0.56 s, median 0.53 s | 1 of 8 |
 | pin + #15432 | 8 | 0.32–0.65 s, median 0.64 s | 1 of 8 |
@@ -370,7 +371,7 @@ the 24-trial tail-probe scenario (seeds 1–2). The logs are in
 `results/2026-10-27/rack-decisions/`, and `parse-rack-decisions.py`
 summarizes one.
 
-- **The stall.** With RACK on, as Tailscale 1.104.x ships it, every trial of
+- **The stall.** With RACK on, as Tailscale 1.104.0 to 1.104.4 ship it, every trial of
   both tail-loss scenarios stalls for 3.5–6.0 s, at a median of two
   retransmissions per RTO, whether or not the loss probe gets through.
   Turning netstack's GSO off does not prevent it (median 3.95 and 3.94 s

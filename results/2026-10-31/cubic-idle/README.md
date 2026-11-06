@@ -42,7 +42,7 @@ run's first warm-up overflowed the queue in slow start (2 RTOs); in
 | 30 s | cwnd 75 → 1,242–1,249, 1,732–1,885 queue drops, 4 RTOs, 1.22–1.23 s | cwnd 54 → 68, 0 queue drops, 0 RTOs, 0.30 s |
 | 120 s | cwnd 103 → 13,983, 3,755 queue drops, 4 RTOs, 1.37 s | cwnd 60 → 69, 0 queue drops, 0 RTOs, 0.30 s |
 
-With RACK on, as v1.104.x ships, the pin stalled before the idle period
+With RACK on, as v1.104.0 to v1.104.4 ship it, the pin stalled before the idle period
 mattered ([tailscale/tailscale#21946](https://github.com/tailscale/tailscale/issues/21946)):
 with 5 s of idle, the fetch with the loss took 29.6 s (141 RTOs) and the
 post-idle fetch hit the 30 s timeout after 144 RTOs;
