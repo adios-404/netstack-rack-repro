@@ -1,0 +1,169 @@
+=== run seed=1 start=18:14:35Z load1=7.40 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 1 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 1), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.302 s |  2636 data pkts,   243 retransmitted | RTOs   0
+         after 3s idle | peak 278 data pkts in 1 ms | 241 queue drops | cwnd first 10, max 393, last 193 (ssthresh 9223372036854775807 at first ACK, 193 at last)
+         sender: max phantom Outstanding (outside recovery) 19 pkts, cwnd min 10 max 393 last 193
+         gVisor stats: retransmits 243, timeouts 0, fast retransmits 2, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.302 s, median 0.302 s, max 0.302 s, over 1 s: 0
+path drops toward the client: 241 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=1 exit=0 wall=4s
+
+=== run seed=2 start=18:14:42Z load1=6.65 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 2 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 2), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.305 s |  2844 data pkts,   438 retransmitted | RTOs   0
+         after 3s idle | peak 245 data pkts in 1 ms | 420 queue drops | cwnd first 10, max 499, last 170 (ssthresh 9223372036854775807 at first ACK, 170 at last)
+         sender: max phantom Outstanding (outside recovery) 34 pkts, cwnd min 10 max 499 last 170
+         gVisor stats: retransmits 438, timeouts 0, fast retransmits 3, SACK recoveries 3, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.305 s, median 0.305 s, max 0.305 s, over 1 s: 0
+path drops toward the client: 420 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=2 exit=0 wall=3s
+
+=== run seed=3 start=18:14:49Z load1=6.35 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 3 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 3), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.304 s |  2823 data pkts,   417 retransmitted | RTOs   0
+         after 3s idle | peak 287 data pkts in 1 ms | 409 queue drops | cwnd first 10, max 472, last 161 (ssthresh 9223372036854775807 at first ACK, 161 at last)
+         sender: max phantom Outstanding (outside recovery) 33 pkts, cwnd min 10 max 472 last 161
+         gVisor stats: retransmits 417, timeouts 0, fast retransmits 3, SACK recoveries 3, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.304 s, median 0.304 s, max 0.304 s, over 1 s: 0
+path drops toward the client: 409 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=3 exit=0 wall=3s
+
+=== run seed=4 start=18:15:06Z load1=5.54 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 4 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 4), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.302 s |  2660 data pkts,   267 retransmitted | RTOs   0
+         after 3s idle | peak 282 data pkts in 1 ms | 264 queue drops | cwnd first 10, max 398, last 196 (ssthresh 9223372036854775807 at first ACK, 196 at last)
+         sender: max phantom Outstanding (outside recovery) 19 pkts, cwnd min 10 max 398 last 196
+         gVisor stats: retransmits 267, timeouts 0, fast retransmits 2, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.302 s, median 0.302 s, max 0.302 s, over 1 s: 0
+path drops toward the client: 264 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=4 exit=0 wall=3s
+
+=== run seed=5 start=18:15:13Z load1=5.46 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 5 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 5), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.305 s |  2927 data pkts,   522 retransmitted | RTOs   0
+         after 3s idle | peak 338 data pkts in 1 ms | 495 queue drops | cwnd first 10, max 499, last 170 (ssthresh 9223372036854775807 at first ACK, 170 at last)
+         sender: max phantom Outstanding (outside recovery) 33 pkts, cwnd min 10 max 499 last 170
+         gVisor stats: retransmits 522, timeouts 0, fast retransmits 3, SACK recoveries 3, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.305 s, median 0.305 s, max 0.305 s, over 1 s: 0
+path drops toward the client: 495 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=5 exit=0 wall=3s
+
+=== run seed=6 start=18:15:19Z load1=5.26 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 6 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 6), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.306 s |  2850 data pkts,   444 retransmitted | RTOs   0
+         after 3s idle | peak 238 data pkts in 1 ms | 429 queue drops | cwnd first 10, max 506, last 172 (ssthresh 9223372036854775807 at first ACK, 172 at last)
+         sender: max phantom Outstanding (outside recovery) 34 pkts, cwnd min 10 max 506 last 172
+         gVisor stats: retransmits 444, timeouts 0, fast retransmits 3, SACK recoveries 3, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.306 s, median 0.306 s, max 0.306 s, over 1 s: 0
+path drops toward the client: 429 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=6 exit=0 wall=4s
+
+=== run seed=7 start=18:15:36Z load1=5.33 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 7 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 7), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.302 s |  2655 data pkts,   262 retransmitted | RTOs   0
+         after 3s idle | peak 283 data pkts in 1 ms | 260 queue drops | cwnd first 10, max 399, last 196 (ssthresh 9223372036854775807 at first ACK, 196 at last)
+         sender: max phantom Outstanding (outside recovery) 19 pkts, cwnd min 10 max 399 last 196
+         gVisor stats: retransmits 262, timeouts 0, fast retransmits 2, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.302 s, median 0.302 s, max 0.302 s, over 1 s: 0
+path drops toward the client: 260 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=7 exit=0 wall=4s
+
+=== run seed=8 start=18:15:43Z load1=6.22 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 8 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 8), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.305 s |  2833 data pkts,   429 retransmitted | RTOs   0
+         after 3s idle | peak 335 data pkts in 1 ms | 425 queue drops | cwnd first 10, max 501, last 244 (ssthresh 9223372036854775807 at first ACK, 244 at last)
+         sender: max phantom Outstanding (outside recovery) 32 pkts, cwnd min 10 max 501 last 244
+         gVisor stats: retransmits 429, timeouts 0, fast retransmits 2, SACK recoveries 2, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.305 s, median 0.305 s, max 0.305 s, over 1 s: 0
+path drops toward the client: 425 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=8 exit=0 wall=3s
+
+=== run seed=9 start=18:16:02Z load1=5.17 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 9 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 9), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.299 s |  2393 data pkts,     0 retransmitted | RTOs   0
+         after 3s idle | peak 206 data pkts in 1 ms | 0 queue drops | cwnd first 10, max 232, last 232 (ssthresh 9223372036854775807 at first ACK, 32 at last)
+         sender: max phantom Outstanding (outside recovery) 11 pkts, cwnd min 10 max 232 last 232
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.299 s, median 0.299 s, max 0.299 s, over 1 s: 0
+path drops toward the client: 0 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=9 exit=0 wall=3s
+
+=== run seed=10 start=18:16:32Z load1=4.67 cmd: repro-pin-16659-16660 -rack=true -loss none -warmup 0 -fetches 1 -trials 1 -timeout 30s -interval 3s -seed 10 -rtt 3ms -rate-mbps 80 -queue 256
+sender:   gVisor v0.0.0-20260915211658-a6f909f08a72 => fix-test/trees/gvisor-pin-16659-16660 (RACK on, cubic, host GSO true, clock resolution 0s)
+client:   gVisor, TCP timestamps on
+path:     RTT 3ms + up to 2x200µs jitter (seed 10), 80 Mbit/s toward the client, queue 256 packets (drop-tail), MTU 1280
+loss:     none scripted
+workload: 1 trial(s), each a new connection with 0 warm-up + 1 measured fetches of 2800000 bytes, 3s idle before each
+
+trial 1 fetch 1 measured   0.305 s |  2800 data pkts,   395 retransmitted | RTOs   0
+         after 3s idle | peak 196 data pkts in 1 ms | 383 queue drops | cwnd first 10, max 481, last 164 (ssthresh 9223372036854775807 at first ACK, 164 at last)
+         sender: max phantom Outstanding (outside recovery) 33 pkts, cwnd min 10 max 481 last 164
+         gVisor stats: retransmits 395, timeouts 0, fast retransmits 3, SACK recoveries 3, TLP recoveries 0, spurious RTO recoveries 0
+          (gVisor connection: TCP timestamps on)
+
+measured fetches: 1, min 0.305 s, median 0.305 s, max 0.305 s, over 1 s: 0
+path drops toward the client: 383 by the queue, 0 scripted; reordered (held 200µs): 0
+=== end seed=10 exit=0 wall=3s
+
